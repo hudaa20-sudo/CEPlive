@@ -19,7 +19,7 @@ define('QR_EXPIRY_MINUTES', 15);
 // ---- AI chatbot settings (Google Gemini — free tier, no card needed) ----
 // Get a key from https://aistudio.google.com/app/apikey and paste it below.
 // Never share this key or commit it to a public repo.
-define('GEMINI_API_KEY', 'AQ.Ab8RN6K-5gslCdI4KKKTG9d5uB_5gTM1llbCH_poGr--CWxLfA');
+define('GEMINI_API_KEY', 'paste here');
 define('GEMINI_MODEL', 'gemini-3.6-flash');
 
 function get_db(): PDO {
