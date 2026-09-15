@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log In / Sign Up</title>
+<style>
+  :root{
+    --blue: #5b8def;
+    --blue-dark: #3f6fe0;
+    --ink: #14161a;
+    --sub: #4b4f58;
+    --illo-bg: #eef1fb;
+    --card: #dfe7fb;
+    --line: #eceff3;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    padding: 24px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink); background: #fff;
+  }
+  h1{ margin: 0; letter-spacing: -0.01em; }
+  p{ margin: 0; }
+  a{ color: inherit; text-decoration: none; }
+  button{ font-family: inherit; }
+  .bg-blob{
+    position: fixed; top: -10%; right: -10%; width: 480px; height: 480px;
+    background: var(--illo-bg); border-radius: 50% 45% 55% 50% / 55% 50% 50% 45%; z-index: -1;
+  }
+  .card{
+    background: #fff; width: 100%; max-width: 400px; border: 1px solid var(--line);
+    border-radius: 28px; padding: 40px 34px; box-shadow: 0 30px 60px rgba(20,22,26,0.08);
+  }
+  .logo{ display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--sub); margin-bottom: 28px; }
+  .logo img{ width: 36px; height: 36px; object-fit: cover; border-radius: 8px; }
+  .tabs{ display: flex; background: var(--illo-bg); border-radius: 999px; padding: 4px; margin-bottom: 18px; }
+  .tab{
+    flex: 1; text-align: center; padding: 10px 0; font-size: 14px; font-weight: 700;
+    color: var(--sub); border-radius: 999px; cursor: pointer; transition: all .15s ease; user-select: none;
+  }
+  .tab.active{ background: var(--blue); color: #fff; }
+  .role-toggle{ display: flex; gap: 8px; margin-bottom: 22px; }
+  .role-btn{
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 9px 0; font-size: 13px; font-weight: 700; color: var(--sub); background: #fff;
+    border: 1.5px solid var(--line); border-radius: 999px; cursor: pointer; transition: all .15s ease; user-select: none;
+  }
+  .role-btn svg{ width: 14px; height: 14px; }
+  .role-btn.active{ border-color: var(--blue); color: var(--blue-dark); background: var(--illo-bg); }
+  h1.title{ font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+  p.sub{ color: var(--sub); font-size: 14px; margin-bottom: 26px; }
+  .field{ margin-bottom: 16px; }
+  .field label{ display: block; font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+  .field input{
+    width: 100%; padding: 13px 14px; border: 1px solid var(--line); border-radius: 12px;
+    font-size: 14px; font-family: inherit; background: #fafbfd; transition: border-color .15s ease, background .15s ease;
+  }
+  .field input:focus{ outline: none; border-color: var(--blue); background: #fff; }
+  .password-wrap{ position: relative; }
+  .password-wrap input{ padding-right: 44px; }
+  .toggle-password{
+    position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+    width: 34px; height: 34px; border: none; background: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; color: var(--sub); border-radius: 8px;
+  }
+  .toggle-password:hover{ color: var(--ink); background: #f0f1f4; }
+  .error{ color: #c0392b; font-size: 12px; margin-top: 5px; display: none; }
+  .field.invalid input{ border-color: #c0392b; }
+  .field.invalid .error{ display: block; }
+  .form-banner{
+    display: none; align-items: center; gap: 8px; background: #fdecea; border: 1px solid #f3b9b3;
+    color: #c0392b; font-size: 13px; font-weight: 600; padding: 10px 12px; border-radius: 12px; margin-bottom: 18px;
+  }
+  .form-banner.show{ display: flex; }
+  .form-banner.info{ background: #eef6ec; border-color: #bfe0b6; color: #2f6b2f; }
+  .row-between{ display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 22px; }
+  .row-between a{ color: var(--blue); font-weight: 600; cursor: pointer; }
+  .row-between a:hover{ color: var(--blue-dark); }
+  .checkbox-row{ display: flex; align-items: center; gap: 6px; color: var(--sub); }
+  .admin-note{
+    display: none; align-items: center; gap: 8px; background: #fff6e9; border: 1px solid #f3d9a8;
+    color: #8a5a00; font-size: 12px; font-weight: 600; padding: 10px 12px; border-radius: 12px; margin-bottom: 18px;
+  }
+  .admin-note.show{ display: flex; }
+  button.submit{
+    width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 15px; border: none; border-radius: 999px; background: var(--blue); color: #fff;
+    font-size: 15px; font-weight: 700; cursor: pointer; transition: background .15s ease;
+  }
+  button.submit:hover{ background: var(--blue-dark); }
+  button.submit:disabled{ background: var(--card); color: var(--sub); cursor: not-allowed; }
+  .switch-msg{ text-align: center; font-size: 13px; color: var(--sub); margin-top: 20px; }
+  .switch-msg a{ color: var(--blue); font-weight: 700; cursor: pointer; }
+  .switch-msg a:hover{ color: var(--blue-dark); }
+  .form{ display: none; }
+  .form.active{ display: block; }
+  .success{ display: none; text-align: center; padding: 12px 0; }
+  .success.show{ display: block; }
+  .success .check{
+    width: 56px; height: 56px; border-radius: 50%; background: var(--illo-bg); color: var(--blue);
+    font-size: 26px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;
+  }
+  .role-pill{
+    display: inline-block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+    color: var(--blue-dark); background: var(--illo-bg); padding: 4px 10px; border-radius: 999px; margin-top: 10px;
+  }
+
+  /* Forgot password modal */
+  .modal-overlay{
+    position: fixed; inset: 0; background: rgba(20,22,26,0.45); display: none;
+    align-items: center; justify-content: center; padding: 20px; z-index: 100;
+  }
+  .modal-overlay.open{ display: flex; }
+  .modal{
+    background: #fff; border-radius: 20px; padding: 32px; width: 100%; max-width: 380px;
+    position: relative; max-height: 90vh; overflow-y: auto;
+  }
+  .modal h2{ margin: 0 0 6px; font-size: 20px; font-weight: 800; }
+  .modal p.sub{ margin: 0 0 20px; }
+  .modal-close{ position: absolute; top: 16px; right: 16px; background: none; border: none; cursor: pointer; color: var(--sub); }
+  .modal-success{ display: none; text-align: center; padding: 12px 0 4px; }
+  .modal-success.show{ display: block; }
+  .modal-success svg{ color: var(--blue); margin-bottom: 10px; }
+  .dev-link-box{
+    margin-top: 14px; padding: 10px 12px; background: var(--illo-bg); border-radius: 10px;
+    font-size: 12px; word-break: break-all; color: var(--blue-dark);
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-blob"></div>
+
+<div class="card">
+  <div class="logo">
+    <img src="logo.jpeg" alt="VendorVerse logo">
+    VendorVerse
+  </div>
+
+  <div id="authWrap">
+    <div class="tabs">
+      <div class="tab active" id="loginTab" onclick="switchTab('login')">Log In</div>
+      <div class="tab" id="signupTab" onclick="switchTab('signup')">Sign Up</div>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div class="form active" id="loginForm">
+      <h1 class="title">Welcome back</h1>
+      <p class="sub">Log in to continue to your account.</p>
+
+      <div class="role-toggle" id="loginRoleToggle">
+        <div class="role-btn active" data-role="user" onclick="setRole('user')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          User
+        </div>
+        <div class="role-btn" data-role="admin" onclick="setRole('admin')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg>
+          Admin
+        </div>
+      </div>
+
+      <div class="admin-note" id="loginAdminNote">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Logging in as an administrator.
+      </div>
+
+      <div class="form-banner" id="loginBanner"></div>
+
+      <form id="loginFormEl" novalidate>
+        <div class="field" id="loginEmailField">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com">
+          <div class="error" id="loginEmailError">Please enter a valid email.</div>
+        </div>
+        <div class="field" id="loginPasswordField">
+          <label for="loginPassword">Password</label>
+          <div class="password-wrap">
+            <input type="password" id="loginPassword" placeholder="Enter your password">
+            <button type="button" class="toggle-password" data-target="loginPassword" aria-label="Show password">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="error" id="loginPasswordError">Password must be at least 6 characters.</div>
+        </div>
+        <div class="row-between">
+          <label class="checkbox-row"><input type="checkbox"> Remember me</label>
+          <a onclick="openForgotModal()">Forgot password?</a>
+        </div>
+        <button type="submit" class="submit" id="loginBtn">
+          <span id="loginBtnText">Log In</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </form>
+      <p class="switch-msg">Don't have an account? <a onclick="switchTab('signup')">Sign up</a></p>
+    </div>
+
+    <!-- SIGNUP FORM (no admin option — everyone signs up as a regular user) -->
+    <div class="form" id="signupForm">
+      <h1 class="title">Create account</h1>
+      <p class="sub">Sign up to get started.</p>
+      <div class="form-banner" id="signupBanner"></div>
+      <form id="signupFormEl" novalidate>
+        <div class="field" id="signupNameField">
+          <label for="signupName">Full name</label>
+          <input type="text" id="signupName" placeholder="e.g. Tasneem Khan">
+          <div class="error">Please enter your name.</div>
+        </div>
+        <div class="field" id="signupEmailField">
+          <label for="signupEmail">Email</label>
+          <input type="email" id="signupEmail" placeholder="you@example.com">
+          <div class="error">Please enter a valid email.</div>
+        </div>
+        <div class="field" id="signupPasswordField">
+          <label for="signupPassword">Password</label>
+          <div class="password-wrap">
+            <input type="password" id="signupPassword" placeholder="At least 6 characters">
+            <button type="button" class="toggle-password" data-target="signupPassword" aria-label="Show password">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="error">Password must be at least 6 characters.</div>
+        </div>
+        <div class="field" id="signupConfirmField">
+          <label for="signupConfirm">Confirm password</label>
+          <div class="password-wrap">
+            <input type="password" id="signupConfirm" placeholder="Re-enter your password">
+            <button type="button" class="toggle-password" data-target="signupConfirm" aria-label="Show password">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="error">Passwords do not match.</div>
+        </div>
+        <button type="submit" class="submit" id="signupBtn">
+          Sign Up
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </form>
+      <p class="switch-msg">Already have an account? <a onclick="switchTab('login')">Log in</a></p>
+    </div>
+  </div>
+
+  <!-- SUCCESS STATE -->
+  <div class="success" id="successBox">
+    <div class="check">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h1 class="title" id="successTitle">Success!</h1>
+    <p class="sub" id="successMsg">You're all set.</p>
+    <span class="role-pill" id="successRolePill">User</span>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD MODAL -->
+<div class="modal-overlay" id="forgotModal">
+  <div class="modal">
+    <button class="modal-close" id="closeForgot" type="button" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <div id="forgotFormWrap">
+      <h2>Reset your password</h2>
+      <p class="sub">Enter your account email and choose a new password.</p>
+      <form id="forgotFormEl" novalidate>
+        <div class="field" id="forgotEmailField">
+          <label for="forgotEmail">Email</label>
+          <input type="email" id="forgotEmail" placeholder="you@example.com">
+          <div class="error">Please enter a valid email.</div>
+        </div>
+        <div class="field" id="forgotPasswordField">
+          <label for="forgotPassword">New password</label>
+          <div class="password-wrap">
+            <input type="password" id="forgotPassword" placeholder="At least 6 characters">
+            <button type="button" class="toggle-password" data-target="forgotPassword" aria-label="Show password">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="error">Password must be at least 6 characters.</div>
+        </div>
+        <div class="field" id="forgotConfirmField">
+          <label for="forgotConfirm">Confirm new password</label>
+          <div class="password-wrap">
+            <input type="password" id="forgotConfirm" placeholder="Re-enter your new password">
+            <button type="button" class="toggle-password" data-target="forgotConfirm" aria-label="Show password">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="error">Passwords do not match.</div>
+        </div>
+        <div class="form-banner" id="forgotBanner"></div>
+        <button type="submit" class="submit" id="forgotBtn">Reset password</button>
+      </form>
+    </div>
+
+    <div class="modal-success" id="forgotSuccess">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg>
+      <h2>Password updated</h2>
+      <p class="sub">You can now log in with your new password.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---- Show/hide password toggles ----
+  const EYE_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+  const EYE_OFF_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.8 21.8 0 0 1 5.06-6.06M9.9 4.24A10.4 10.4 0 0 1 12 4c7 0 11 8 11 8a21.8 21.8 0 0 1-2.66 3.94M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+
+  document.querySelectorAll('.toggle-password').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.target);
+      const showing = input.type === 'text';
+      input.type = showing ? 'password' : 'text';
+      btn.innerHTML = showing ? EYE_ICON : EYE_OFF_ICON;
+      btn.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+    });
+  });
+
+  let currentRole = 'user';
+
+  // If a real (user) session is active, skip past the login form. The admin
+  // flag is intentionally NOT checked here — it stays in sessionStorage
+  // even after you leave admin.html, and auto-redirecting on that caused
+  // login.html to keep bouncing straight to admin.html.
+  window.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const res = await fetch('api/session_check.php');
+      const data = await res.json();
+      if (data.logged_in) {
+        window.location.href = 'dashboard.html';
+      }
+    } catch (err) {
+      console.error('Session check failed', err);
+    }
+  });
+
+  function switchTab(tab) {
+    document.getElementById('loginTab').classList.toggle('active', tab === 'login');
+    document.getElementById('signupTab').classList.toggle('active', tab === 'signup');
+    document.getElementById('loginForm').classList.toggle('active', tab === 'login');
+    document.getElementById('signupForm').classList.toggle('active', tab === 'signup');
+  }
+
+  function setRole(role) {
+    currentRole = role;
+    document.getElementById('loginRoleToggle').querySelectorAll('.role-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.role === role);
+    });
+    document.getElementById('loginAdminNote').classList.toggle('show', role === 'admin');
+    document.getElementById('loginBtnText').textContent = role === 'admin' ? 'Admin Log In' : 'Log In';
+  }
+
+  function clearError(fieldId) { document.getElementById(fieldId).classList.remove('invalid'); }
+  function showError(fieldId) { document.getElementById(fieldId).classList.add('invalid'); }
+  function showBanner(id, msg, kind) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.className = 'form-banner show' + (kind ? ' ' + kind : '');
+  }
+  function hideBanner(id) {
+    const el = document.getElementById(id);
+    el.className = 'form-banner';
+  }
+
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  // Client-side only — there's no real admin account/role in the database
+  // yet (see api/schema.sql: `vendors` has no role column). This is a
+  // stand-in until a proper admin table + backend check exists, so treat
+  // it as a placeholder, not real access control, once this goes live.
+  const ADMIN_EMAIL = 'admin@example.com';
+  const ADMIN_PASSWORD = 'Admin@123';
+
+  const loginEmail = document.getElementById('loginEmail');
+  const loginPassword = document.getElementById('loginPassword');
+  const loginEmailErrorEl = document.getElementById('loginEmailError');
+  const loginPasswordErrorEl = document.getElementById('loginPasswordError');
+  const DEFAULT_LOGIN_EMAIL_ERROR = loginEmailErrorEl.textContent;
+  const DEFAULT_LOGIN_PASSWORD_ERROR = loginPasswordErrorEl.textContent;
+
+  loginEmail.addEventListener('input', () => {
+    clearError('loginEmailField');
+    loginEmailErrorEl.textContent = DEFAULT_LOGIN_EMAIL_ERROR;
+    hideBanner('loginBanner');
+  });
+  loginPassword.addEventListener('input', () => {
+    clearError('loginPasswordField');
+    loginPasswordErrorEl.textContent = DEFAULT_LOGIN_PASSWORD_ERROR;
+    hideBanner('loginBanner');
+  });
+
+  document.getElementById('loginFormEl').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    hideBanner('loginBanner');
+
+    loginEmailErrorEl.textContent = DEFAULT_LOGIN_EMAIL_ERROR;
+    loginPasswordErrorEl.textContent = DEFAULT_LOGIN_PASSWORD_ERROR;
+
+    let valid = true;
+    if (!emailPattern.test(loginEmail.value.trim())) { showError('loginEmailField'); valid = false; }
+    if (loginPassword.value.length < 6) { showError('loginPasswordField'); valid = false; }
+    if (!valid) return;
+
+    const enteredEmail = loginEmail.value.trim();
+    const enteredPassword = loginPassword.value;
+
+    // ---- ADMIN PATH: hardcoded check, no backend call ----
+    if (currentRole === 'admin') {
+      const emailOk = enteredEmail === ADMIN_EMAIL;
+      const passwordOk = enteredPassword === ADMIN_PASSWORD;
+
+      if (!emailOk) {
+        showError('loginEmailField');
+        loginEmailErrorEl.textContent = 'Incorrect email.';
+      }
+      if (!passwordOk) {
+        showError('loginPasswordField');
+        loginPasswordErrorEl.textContent = 'Incorrect password.';
+      }
+      if (!emailOk || !passwordOk) return;
+
+      showSuccess('Welcome back!', "You've logged in successfully.", 'Admin');
+      sessionStorage.setItem('vv_role', 'admin');
+      setTimeout(() => { window.location.href = 'admin.html'; }, 700);
+      return;
+    }
+
+    // ---- USER PATH: real backend ----
+    const loginBtn = document.getElementById('loginBtn');
+    const loginBtnText = document.getElementById('loginBtnText');
+    loginBtn.disabled = true;
+    loginBtnText.textContent = 'Logging in...';
+
+    try {
+      const res = await fetch('api/login.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: enteredEmail,
+          password: enteredPassword
+        })
+      });
+      const data = await res.json();
+
+      if (!data.success) {
+        showBanner('loginBanner', data.error || 'Incorrect email or password.');
+        loginBtn.disabled = false;
+        loginBtnText.textContent = 'Log In';
+        return;
+      }
+
+      showSuccess('Welcome back!', "You've logged in successfully.", 'User');
+      sessionStorage.removeItem('vv_role');
+
+      // Decide where to land: if a profile already exists, go straight to
+      // the dashboard; otherwise send them to finish setting it up first.
+      let destination = 'profile.html';
+      try {
+        const profRes = await fetch('api/profile_get.php');
+        const profData = await profRes.json();
+        if (profData.success && profData.profile) destination = 'dashboard.html';
+      } catch (err) {
+        console.error('Could not check profile status', err);
+      }
+
+      setTimeout(() => { window.location.href = destination; }, 700);
+    } catch (err) {
+      showBanner('loginBanner', 'Could not reach the server. Is your PHP/MySQL setup running?');
+      loginBtn.disabled = false;
+      loginBtnText.textContent = 'Log In';
+    }
+  });
+
+  // ---- SIGNUP (always creates a regular user — no admin path) ----
+  const signupName = document.getElementById('signupName');
+  const signupEmail = document.getElementById('signupEmail');
+  const signupPassword = document.getElementById('signupPassword');
+  const signupConfirm = document.getElementById('signupConfirm');
+
+  signupName.addEventListener('input', () => clearError('signupNameField'));
+  signupEmail.addEventListener('input', () => { clearError('signupEmailField'); hideBanner('signupBanner'); });
+  signupPassword.addEventListener('input', () => clearError('signupPasswordField'));
+  signupConfirm.addEventListener('input', () => clearError('signupConfirmField'));
+
+  document.getElementById('signupFormEl').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    hideBanner('signupBanner');
+    let valid = true;
+    if (signupName.value.trim().length < 2) { showError('signupNameField'); valid = false; }
+    if (!emailPattern.test(signupEmail.value.trim())) { showError('signupEmailField'); valid = false; }
+    if (signupPassword.value.length < 6) { showError('signupPasswordField'); valid = false; }
+    if (signupConfirm.value !== signupPassword.value || signupConfirm.value === '') { showError('signupConfirmField'); valid = false; }
+    if (!valid) return;
+
+    const signupBtn = document.getElementById('signupBtn');
+    signupBtn.disabled = true;
+    signupBtn.textContent = 'Creating account...';
+
+    try {
+      const res = await fetch('api/register.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: signupName.value.trim(),
+          email: signupEmail.value.trim(),
+          password: signupPassword.value
+        })
+      });
+      const data = await res.json();
+
+      if (!data.success) {
+        showBanner('signupBanner', data.error || 'Could not create your account.');
+        signupBtn.disabled = false;
+        signupBtn.textContent = 'Sign Up';
+        return;
+      }
+
+      // No mail server locally — register.php hands the verification link
+      // straight back instead of emailing it. Log it so it's easy to find.
+      if (data.verify_link) console.log('Email verification link:', data.verify_link);
+
+      showSuccess('Account created!', 'Redirecting you to your profile setup...', 'User');
+      setTimeout(() => { window.location.href = 'profile.html'; }, 700);
+    } catch (err) {
+      showBanner('signupBanner', 'Could not reach the server. Is your PHP/MySQL setup running?');
+      signupBtn.disabled = false;
+      signupBtn.textContent = 'Sign Up';
+    }
+  });
+
+  function showSuccess(title, msg, roleLabel) {
+    document.getElementById('authWrap').style.display = 'none';
+    document.getElementById('successTitle').textContent = title;
+    document.getElementById('successMsg').textContent = msg;
+    document.getElementById('successRolePill').textContent = roleLabel;
+    document.getElementById('successBox').classList.add('show');
+  }
+
+  // ---- FORGOT / RESET PASSWORD MODAL (direct: email + new password, no link) ----
+  const forgotModal = document.getElementById('forgotModal');
+  const forgotEmail = document.getElementById('forgotEmail');
+  const forgotPassword = document.getElementById('forgotPassword');
+  const forgotConfirm = document.getElementById('forgotConfirm');
+
+  function openForgotModal() {
+    document.getElementById('forgotFormWrap').style.display = '';
+    document.getElementById('forgotSuccess').classList.remove('show');
+    hideBanner('forgotBanner');
+    forgotEmail.value = '';
+    forgotPassword.value = '';
+    forgotConfirm.value = '';
+    clearError('forgotEmailField');
+    clearError('forgotPasswordField');
+    clearError('forgotConfirmField');
+    forgotModal.classList.add('open');
+  }
+  function closeForgotModal() { forgotModal.classList.remove('open'); }
+
+  document.getElementById('closeForgot').addEventListener('click', closeForgotModal);
+  forgotModal.addEventListener('click', (e) => { if (e.target === forgotModal) closeForgotModal(); });
+  forgotEmail.addEventListener('input', () => { clearError('forgotEmailField'); hideBanner('forgotBanner'); });
+  forgotPassword.addEventListener('input', () => { clearError('forgotPasswordField'); hideBanner('forgotBanner'); });
+  forgotConfirm.addEventListener('input', () => { clearError('forgotConfirmField'); hideBanner('forgotBanner'); });
+
+  document.getElementById('forgotFormEl').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideBanner('forgotBanner');
+
+    let valid = true;
+    if (!emailPattern.test(forgotEmail.value.trim())) { showError('forgotEmailField'); valid = false; }
+    if (forgotPassword.value.length < 6) { showError('forgotPasswordField'); valid = false; }
+    if (forgotConfirm.value !== forgotPassword.value || forgotConfirm.value === '') { showError('forgotConfirmField'); valid = false; }
+    if (!valid) return;
+
+    const forgotBtn = document.getElementById('forgotBtn');
+    forgotBtn.disabled = true;
+    forgotBtn.textContent = 'Resetting...';
+
+    try {
+      const res = await fetch('api/reset_password.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: forgotEmail.value.trim(), password: forgotPassword.value })
+      });
+      const data = await res.json();
+      forgotBtn.disabled = false;
+      forgotBtn.textContent = 'Reset password';
+
+      if (!data.success) {
+        showBanner('forgotBanner', data.error || 'Could not reset your password.');
+        return;
+      }
+
+      document.getElementById('forgotFormWrap').style.display = 'none';
+      document.getElementById('forgotSuccess').classList.add('show');
+    } catch (err) {
+      forgotBtn.disabled = false;
+      forgotBtn.textContent = 'Reset password';
+      showBanner('forgotBanner', 'Could not reach the server. Is your PHP/MySQL setup running?');
+    }
+  });
+</script>
+
+</body>
+</html>

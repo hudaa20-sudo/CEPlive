@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generate QR — VendorVerse</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root{
+    --blue: #5b8def;
+    --blue-dark: #3f6fe0;
+    --ink: #14161a;
+    --sub: #4b4f58;
+    --line: #eceff3;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin: 0;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  h1,h2{ margin:0; letter-spacing:-0.01em; }
+  p{ margin:0; }
+  a{ color: inherit; text-decoration:none; }
+
+  .back-link{
+    position: fixed; top: 24px; left: 24px;
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: 600; color: var(--sub);
+  }
+  .back-link:hover{ color: var(--ink); }
+
+  .qr-wrap{ width: 100%; max-width: 440px; }
+
+  .qr-logo{
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    font-weight: 600; color: #9aa1af; margin-bottom: 28px;
+  }
+  .qr-logo img{
+    width: 62px; height: 62px; border-radius: 8px; object-fit: cover;
+  }
+
+  .qr-card{ border: 1px solid var(--line); border-radius: 24px; padding: 32px; }
+  .qr-card h2{ font-size: 22px; font-weight: 800; margin-bottom: 6px; text-align: center; }
+  .qr-sub{ color: var(--sub); font-size: 14px; text-align: center; margin-bottom: 24px; }
+
+  .qr-tabs{ display:flex; gap:6px; background:#f4f5f8; padding:4px; border-radius: 999px; margin-bottom: 22px; }
+  .qr-tab{
+    flex:1; border:none; background:none; padding:9px 0; border-radius:999px;
+    font-weight:600; font-size:13.5px; color: var(--sub); cursor:pointer;
+  }
+  .qr-tab.active{ background:#fff; color: var(--ink); box-shadow: 0 1px 4px rgba(20,22,26,0.12); }
+
+  .qr-panel{ display:none; }
+  .qr-panel.active{ display:block; }
+
+  .field{ margin-bottom: 14px; }
+  .qr-label{ display:block; font-size:13px; font-weight:600; margin-bottom:6px; color: var(--ink); }
+  .field input{
+    width: 100%; padding: 12px 14px; border: 1px solid #e2e5eb; border-radius: 10px;
+    font-family: inherit; font-size: 14px;
+  }
+  .field input:focus{ outline:none; border-color: var(--blue); }
+  .qr-row2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+  .qr-error{ color:#c0392b; font-size:13px; margin: -4px 0 12px; display:none; }
+  .qr-error.show{ display:block; }
+
+  .generate-btn{
+    width: 100%; background: var(--blue); color: #fff; border: none; font-weight: 700;
+    font-size: 15px; padding: 14px; border-radius: 999px; cursor: pointer; margin-top: 6px;
+  }
+  .generate-btn:hover{ background: var(--blue-dark); }
+
+  .qr-result{
+    margin-top:22px; display:none; text-align:center;
+    border: 1px solid var(--line); border-radius: 20px; padding: 24px;
+  }
+  .qr-result.show{ display:block; }
+  #qrcode{ display:inline-block; padding:14px; background:#fff; border-radius:14px; border: 1px solid var(--line); }
+  #qrcode img, #qrcode canvas{ display:block; }
+
+  .qr-result-actions{ display:flex; gap:10px; margin-top:16px; }
+  .qr-ghost-btn{
+    flex:1; background:#fff; border:1px solid var(--line); color: var(--ink);
+    font-weight:600; font-size:14px; padding:11px; border-radius:999px; cursor:pointer;
+  }
+  .qr-ghost-btn:hover{ background:#f7f8fa; }
+</style>
+</head>
+<body>
+
+  <a href="index.html" class="back-link">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Back to home
+  </a>
+
+  <div class="qr-wrap">
+    <div class="qr-logo">
+      <img src="logo.jpeg" alt="VendorVerse logo">
+      VendorVerse
+    </div>
+
+    <div class="qr-card">
+      <h2>Generate a QR code</h2>
+      <p class="qr-sub">Create a UPI payment QR or a link/text QR for your business.</p>
+
+      <div class="qr-tabs">
+        <button class="qr-tab active" type="button" data-tab="upi">UPI Payment</button>
+        <button class="qr-tab" type="button" data-tab="link">Link / Text</button>
+      </div>
+
+      <!-- UPI PANEL -->
+      <div class="qr-panel active" id="upiPanel">
+        <div class="field">
+          <label class="qr-label" for="upiId">Your UPI ID</label>
+          <input type="text" id="upiId" placeholder="name@bank">
+        </div>
+        <div class="field">
+          <label class="qr-label" for="payeeName">Payee / business name</label>
+          <input type="text" id="payeeName" placeholder="Your business name">
+        </div>
+        <div class="qr-row2">
+          <div class="field">
+            <label class="qr-label" for="upiAmount">Amount (optional)</label>
+            <input type="number" id="upiAmount" placeholder="0.00" min="0" step="0.01">
+          </div>
+          <div class="field">
+            <label class="qr-label" for="upiNote">Note (optional)</label>
+            <input type="text" id="upiNote" placeholder="Payment for...">
+          </div>
+        </div>
+        <p class="qr-error" id="upiError">Please enter a valid UPI ID and payee name.</p>
+        <button class="generate-btn" type="button" id="generateUpiBtn">Generate QR</button>
+      </div>
+
+      <!-- LINK/TEXT PANEL -->
+      <div class="qr-panel" id="linkPanel">
+        <div class="field">
+          <label class="qr-label" for="linkText">Link or text</label>
+          <input type="text" id="linkText" placeholder="https://yourbusiness.com">
+        </div>
+        <p class="qr-error" id="linkError">Please enter a link or some text.</p>
+        <button class="generate-btn" type="button" id="generateLinkBtn">Generate QR</button>
+      </div>
+
+      <!-- RESULT -->
+      <div class="qr-result" id="qrResult">
+        <div id="qrcode"></div>
+        <div class="qr-result-actions">
+          <button class="qr-ghost-btn" type="button" id="downloadBtn">Download PNG</button>
+          <button class="qr-ghost-btn" type="button" id="anotherBtn">Make another</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Require login before generating any QR codes.
+    (async function checkAuth() {
+      try {
+        const res = await fetch('api/session_check.php');
+        const data = await res.json();
+        if (!data.logged_in) {
+          window.location.href = 'login.html';
+        }
+      } catch (err) {
+        console.error('Session check failed', err);
+      }
+    })();
+
+    const tabs = document.querySelectorAll('.qr-tab');
+    const panels = { upi: document.getElementById('upiPanel'), link: document.getElementById('linkPanel') };
+    const qrResult = document.getElementById('qrResult');
+    const qrcodeEl = document.getElementById('qrcode');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.toggle('active', t === tab));
+        Object.entries(panels).forEach(([key, el]) => el.classList.toggle('active', key === tab.dataset.tab));
+        qrResult.classList.remove('show');
+        qrcodeEl.innerHTML = '';
+      });
+    });
+
+    function renderQR(text) {
+      qrcodeEl.innerHTML = '';
+      new QRCode(qrcodeEl, {
+        text: text,
+        width: 220,
+        height: 220,
+        colorDark: '#14161a',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+      });
+      qrResult.classList.add('show');
+      qrResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // UPI generation — the backend creates a signed, short-lived, one-time
+    // transaction record and hands back a scan URL. The QR encodes that URL,
+    // never the raw UPI details, so scanning always resolves through the
+    // server (see api/qr_scan.php) rather than exposing editable payment data.
+    document.getElementById('generateUpiBtn').addEventListener('click', async () => {
+      const upiId = document.getElementById('upiId').value.trim();
+      const payeeName = document.getElementById('payeeName').value.trim();
+      const amount = document.getElementById('upiAmount').value.trim();
+      const note = document.getElementById('upiNote').value.trim();
+      const errorEl = document.getElementById('upiError');
+
+      const upiPattern = /^[\w.\-]+@[\w.\-]+$/;
+      if (!upiPattern.test(upiId) || !payeeName) {
+        errorEl.classList.add('show');
+        qrResult.classList.remove('show');
+        return;
+      }
+      errorEl.classList.remove('show');
+
+      const btn = document.getElementById('generateUpiBtn');
+      btn.disabled = true;
+      btn.textContent = 'Generating...';
+
+      try {
+        const res = await fetch('api/qr_generate.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ upiId, payeeName, amount, note })
+        });
+        const data = await res.json();
+        if (!data.success) {
+          errorEl.textContent = data.error || 'Could not generate QR code.';
+          errorEl.classList.add('show');
+          qrResult.classList.remove('show');
+          return;
+        }
+        renderQR(data.qr_content);
+      } catch (err) {
+        errorEl.textContent = 'Could not reach the server. Is your PHP/MySQL setup running?';
+        errorEl.classList.add('show');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Generate QR';
+      }
+    });
+
+    // Link/text generation
+    document.getElementById('generateLinkBtn').addEventListener('click', () => {
+      const text = document.getElementById('linkText').value.trim();
+      const errorEl = document.getElementById('linkError');
+
+      if (!text) {
+        errorEl.classList.add('show');
+        qrResult.classList.remove('show');
+        return;
+      }
+      errorEl.classList.remove('show');
+      renderQR(text);
+    });
+
+    // Download PNG
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      const canvas = qrcodeEl.querySelector('canvas');
+      const img = qrcodeEl.querySelector('img');
+      const link = document.createElement('a');
+      link.download = 'qr-code.png';
+      if (canvas) {
+        link.href = canvas.toDataURL('image/png');
+      } else if (img) {
+        link.href = img.src;
+      } else {
+        return;
+      }
+      link.click();
+    });
+
+    // Make another
+    document.getElementById('anotherBtn').addEventListener('click', () => {
+      qrResult.classList.remove('show');
+      qrcodeEl.innerHTML = '';
+      document.getElementById('upiId').value = '';
+      document.getElementById('payeeName').value = '';
+      document.getElementById('upiAmount').value = '';
+      document.getElementById('upiNote').value = '';
+      document.getElementById('linkText').value = '';
+    });
+  </script>
+
+</body>
+</html>

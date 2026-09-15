@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Earnings Tracker — VendorVerse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#0f172a;
+    --ink-soft:#475569;
+    --line:#e2e8f0;
+    --paper:#ffffff;
+    --canvas:#f6f8fb;
+    --blue:#2563eb;
+    --blue-dark:#1d4ed8;
+    --blue-tint:#eaf1ff;
+    --green:#16a34a;
+    --green-tint:#ecfdf3;
+    --red:#dc2626;
+    --red-tint:#fef2f2;
+    --amber:#d97706;
+    --amber-tint:#fffbeb;
+    --radius:14px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Inter', sans-serif;
+    color:var(--ink);
+    background:var(--canvas);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.brand{font-family:'Space Grotesk', sans-serif; letter-spacing:-0.01em;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:760px; margin:0 auto; padding:0 20px;}
+
+  header{
+    background:var(--paper); border-bottom:1px solid var(--line);
+    position:sticky; top:0; z-index:40;
+  }
+  .nav{display:flex; align-items:center; justify-content:space-between; padding:16px 0;}
+  .brand{font-size:19px; font-weight:700; display:flex; align-items:center; gap:9px;}
+  .brand .mark{
+    width:30px; height:30px; border-radius:9px;
+    background:linear-gradient(135deg, var(--blue), #60a5fa);
+    display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px; font-weight:700;
+  }
+  .back-link{font-size:14px; color:var(--ink-soft); font-weight:500;}
+  .back-link:hover{color:var(--ink);}
+
+  .page-title{padding:32px 0 20px;}
+  .page-title h1{font-size:26px; display:flex; align-items:center; gap:10px;}
+  .page-title p{color:var(--ink-soft); font-size:14.5px; margin-top:6px;}
+
+  .card{
+    background:var(--paper); border:1px solid var(--line); border-radius:var(--radius);
+    padding:22px; margin-bottom:20px;
+  }
+
+  .summary-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:20px;}
+  .summary-box{
+    background:var(--paper); border:1px solid var(--line); border-radius:var(--radius); padding:18px;
+  }
+  .summary-box .label{font-size:12.5px; color:var(--ink-soft); font-weight:600; margin-bottom:8px;}
+  .summary-box .value{font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:700;}
+  .summary-box.income .value{color:var(--green);}
+  .summary-box.expense .value{color:var(--red);}
+  .summary-box.profit .value{color:var(--blue);}
+
+  .card h2{font-size:16px; margin-bottom:16px; display:flex; align-items:center; gap:8px;}
+
+  .chart-toggle{display:flex; background:var(--canvas); border-radius:10px; padding:4px; margin-bottom:18px;}
+  .chart-toggle button{
+    flex:1; border:none; background:transparent; padding:9px; border-radius:8px; font-size:13.5px;
+    font-weight:600; color:var(--ink-soft); cursor:pointer;
+  }
+  .chart-toggle button.active{background:#fff; color:var(--ink); box-shadow:0 1px 3px rgba(0,0,0,.08);}
+  .chart-wrap{height:240px; position:relative;}
+  .chart-fallback{
+    height:240px; display:flex; align-items:center; justify-content:center;
+    color:var(--ink-soft); font-size:13.5px; text-align:center; padding:0 20px;
+  }
+
+  .tx-list{margin-top:6px;}
+  .tx-row{
+    display:flex; align-items:center; justify-content:space-between; padding:12px 0;
+    border-bottom:1px solid var(--line); font-size:14px;
+  }
+  .tx-row:last-child{border-bottom:none;}
+  .tx-left{display:flex; align-items:center; gap:12px;}
+  .tx-icon{
+    width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:15px;
+  }
+  .tx-icon.income{background:var(--green-tint); color:var(--green);}
+  .tx-icon.expense{background:var(--red-tint); color:var(--red);}
+  .tx-meta b{display:block; font-size:14px;}
+  .tx-meta span{font-size:12.5px; color:var(--ink-soft);}
+  .tx-amount{font-weight:700; font-family:'Space Grotesk',sans-serif;}
+  .tx-amount.income{color:var(--green);}
+  .tx-amount.expense{color:var(--red);}
+  .empty-state{text-align:center; padding:30px 0; color:var(--ink-soft); font-size:14px;}
+
+  .fab-row{display:flex; gap:12px; margin-bottom:8px;}
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:13px 22px; border-radius:999px; font-weight:600; font-size:14.5px;
+    border:1px solid transparent; cursor:pointer; transition:background .15s ease, transform .15s ease;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn-blue{background:var(--blue); color:#fff; flex:1;}
+  .btn-blue:hover{background:var(--blue-dark);}
+  .btn-outline{background:#fff; color:var(--ink); border-color:var(--line); flex:1;}
+  .btn-outline:hover{border-color:var(--ink);}
+
+  /* Scam awareness panel */
+  .scam-panel{
+    background:var(--amber-tint); border:1px solid #fde3ad; border-radius:var(--radius);
+    padding:18px 20px; margin-bottom:20px; display:flex; align-items:center; gap:14px;
+    cursor:pointer; transition:border-color .15s ease, transform .15s ease;
+  }
+  .scam-panel:hover{border-color:var(--amber); transform:translateY(-1px);}
+  .scam-panel:active{transform:translateY(0);}
+  .scam-panel .scam-icon{
+    width:42px; height:42px; border-radius:11px; background:#fef3c7; color:var(--amber);
+    display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;
+  }
+  .scam-panel .scam-text{flex:1;}
+  .scam-panel .scam-text b{display:block; font-size:14.5px; margin-bottom:2px;}
+  .scam-panel .scam-text span{font-size:13px; color:var(--ink-soft);}
+  .scam-panel .scam-arrow{color:var(--amber); font-size:18px; flex-shrink:0;}
+
+  /* Modal */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(15,23,42,.5); display:none; align-items:center; justify-content:center;
+    z-index:200; padding:20px;
+  }
+  .modal-overlay.active{display:flex;}
+  .modal{
+    background:#fff; border-radius:18px; width:100%; max-width:420px; max-height:90vh; overflow-y:auto;
+    padding:28px; position:relative;
+  }
+  .modal-close{
+    position:absolute; top:16px; right:16px; background:var(--canvas); border:none; width:30px; height:30px;
+    border-radius:50%; cursor:pointer; font-size:15px; color:var(--ink-soft);
+  }
+  .modal h2{font-size:20px; margin-bottom:20px;}
+  .type-toggle{display:flex; gap:10px; margin-bottom:18px;}
+  .type-btn{
+    flex:1; text-align:center; padding:12px; border-radius:10px; border:1.5px solid var(--line);
+    font-size:14px; font-weight:600; color:var(--ink-soft); cursor:pointer; transition:all .15s ease;
+  }
+  .type-btn.income.active{border-color:var(--green); background:var(--green-tint); color:var(--green);}
+  .type-btn.expense.active{border-color:var(--red); background:var(--red-tint); color:var(--red);}
+  .field{margin-bottom:16px;}
+  .field label{display:block; font-size:13.5px; font-weight:600; margin-bottom:6px;}
+  .field input, .field select{
+    width:100%; padding:11px 13px; border:1px solid var(--line); border-radius:10px; font-size:14.5px; font-family:inherit;
+  }
+  .field input:focus, .field select:focus{outline:2px solid var(--blue); outline-offset:1px; border-color:var(--blue);}
+  .field-error{color:#dc2626; font-size:12.5px; margin-top:6px; display:none;}
+
+  @media (max-width:560px){
+    .summary-grid{grid-template-columns:1fr; }
+    .fab-row{flex-direction:column;}
+  }
+
+  /* Page switching */
+  #scamView{display:none;}
+
+  /* Scam awareness page content */
+  .hero{
+    background:linear-gradient(135deg, var(--amber-tint), #fff);
+    border:1px solid #fde3ad; border-radius:var(--radius); padding:22px; margin-bottom:22px;
+    display:flex; align-items:center; gap:16px;
+  }
+  .hero .hero-icon{font-size:34px;}
+  .hero p{font-size:14px; color:var(--ink-soft); margin-top:4px;}
+
+  .card .card-sub{font-size:13px; color:var(--ink-soft); margin-bottom:16px; margin-top:-10px;}
+
+  .scam-item{display:flex; gap:14px; padding:14px 0; border-bottom:1px solid var(--line);}
+  .scam-item:last-child{border-bottom:none; padding-bottom:0;}
+  .scam-item .icon{
+    width:38px; height:38px; border-radius:10px; background:var(--red-tint); color:var(--red);
+    display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0;
+  }
+  .scam-item b{display:block; font-size:14.5px; margin-bottom:3px;}
+  .scam-item span{font-size:13.5px; color:var(--ink-soft);}
+
+  .tip-item{display:flex; gap:14px; padding:14px 0; border-bottom:1px solid var(--line);}
+  .tip-item:last-child{border-bottom:none; padding-bottom:0;}
+  .tip-item .icon{
+    width:38px; height:38px; border-radius:10px; background:var(--green-tint); color:var(--green);
+    display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0;
+  }
+  .tip-item b{display:block; font-size:14.5px; margin-bottom:3px;}
+  .tip-item span{font-size:13.5px; color:var(--ink-soft);}
+
+  .report-box{
+    background:var(--blue-tint); border:1px solid #c7dbfe; border-radius:var(--radius);
+    padding:20px; margin-bottom:20px;
+  }
+  .report-box h2{font-size:15.5px; margin-bottom:8px;}
+  .report-box p{font-size:13.5px; color:var(--ink-soft); margin-bottom:12px;}
+  .report-box .helpline{
+    display:flex; align-items:center; justify-content:space-between; background:#fff;
+    border:1px solid var(--line); border-radius:10px; padding:12px 16px; font-size:14px; font-weight:600;
+  }
+  .report-box .helpline span{color:var(--blue);}
+
+  .back-btn{
+    background:none; border:none; font-size:14px; color:var(--ink-soft); font-weight:500;
+    cursor:pointer; padding:0; margin-bottom:4px; font-family:inherit;
+  }
+  .back-btn:hover{color:var(--ink);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="brand"><span class="mark">V</span> VendorVerse</div>
+    <a href="index.html" class="back-link">← Back to home</a>
+  </div>
+</header>
+
+<div class="wrap">
+<div id="trackerView">
+  <div class="page-title">
+    <h1>💰 Earnings Tracker</h1>
+    <p>Record your daily income and expenses, and see your profit at a glance.</p>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-box income">
+      <div class="label">Today's Earnings</div>
+      <div class="value" id="todayIncome">₹0</div>
+    </div>
+    <div class="summary-box expense">
+      <div class="label">Today's Expenses</div>
+      <div class="value" id="todayExpense">₹0</div>
+    </div>
+    <div class="summary-box profit">
+      <div class="label">Today's Profit</div>
+      <div class="value" id="todayProfit">₹0</div>
+    </div>
+  </div>
+
+  <div class="fab-row">
+    <button class="btn btn-blue" id="openAddBtn">+ Add Transaction</button>
+    <button class="btn btn-outline" id="viewReportBtn">📈 View Report</button>
+  </div>
+
+  <div class="card" id="reportCard">
+    <h2>📊 This Week</h2>
+    <div class="chart-toggle">
+      <button class="active" data-view="daily">Daily</button>
+      <button data-view="weekly">Weekly</button>
+      <button data-view="monthly">Monthly</button>
+    </div>
+    <div class="chart-wrap"><canvas id="earningsChart"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h2>Recent transactions</h2>
+    <div class="tx-list" id="txList">
+      <div class="empty-state">No transactions yet. Tap "+ Add Transaction" to get started.</div>
+    </div>
+  </div>
+
+  <a href="#" class="scam-panel" id="scamPanel">
+    <div class="scam-icon">🛡️</div>
+    <div class="scam-text">
+      <b>Scam Awareness</b>
+      <span>Learn how to spot fake payments, QR code tricks & fraud calls</span>
+    </div>
+    <div class="scam-arrow">→</div>
+  </a>
+
+  <div style="text-align:center; padding-bottom:30px;">
+    <a href="#" id="resetDataLink" style="font-size:13px; color:var(--ink-soft);">Clear all data and start fresh</a>
+  </div>
+</div>
+<!-- /trackerView -->
+
+<div id="scamView">
+  <button class="back-btn" id="backToTrackerBtn">← Back to Earnings Tracker</button>
+  <div class="page-title">
+    <h1>🛡️ Scam Awareness</h1>
+    <p>Know the common tricks used against small vendors, so your hard-earned money stays safe.</p>
+  </div>
+
+  <div class="hero">
+    <div class="hero-icon">⚠️</div>
+    <div>
+      <b style="font-size:15px;">Take 2 minutes to read this</b>
+      <p>Most vendor scams follow the same few patterns. Once you recognize them, they're easy to avoid.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🚩 Common scams to watch for</h2>
+    <div class="card-sub">These are the tricks fraudsters most often use with shop and stall owners.</div>
+
+    <div class="scam-item">
+      <div class="icon">📷</div>
+      <div>
+        <b>Fake "Payment Done" screenshots</b>
+        <span>A customer shows a fake UPI/payment success screenshot and walks off before you check your bank app. Always confirm the amount actually landed in your account before handing over goods.</span>
+      </div>
+    </div>
+
+    <div class="scam-item">
+      <div class="icon">🔳</div>
+      <div>
+        <b>Switched or pasted-over QR codes</b>
+        <span>Scammers stick their own QR code sticker over yours so payments go to them instead of you. Check your QR code regularly against the one you originally printed.</span>
+      </div>
+    </div>
+
+    <div class="scam-item">
+      <div class="icon">💸</div>
+      <div>
+        <b>"Scan to receive money" trick</b>
+        <span>You never need to scan a QR code or enter your UPI PIN to receive money — only to send it. Anyone asking you to "scan to get paid" is trying to take money from you, not give it.</span>
+      </div>
+    </div>
+
+    <div class="scam-item">
+      <div class="icon">☎️</div>
+      <div>
+        <b>Fake bank or KYC calls</b>
+        <span>Callers pretending to be from your bank or a payment app ask for OTPs, PINs, or app permissions to "verify" or "reactivate" your account. Banks never ask for your OTP or PIN over the phone.</span>
+      </div>
+    </div>
+
+    <div class="scam-item">
+      <div class="icon">📦</div>
+      <div>
+        <b>Fake bulk-order suppliers</b>
+        <span>A "wholesaler" offers stock at unusually low prices and asks for advance payment, then disappears. Verify suppliers before paying in advance, especially ones contacted only online.</span>
+      </div>
+    </div>
+
+    <div class="scam-item">
+      <div class="icon">💵</div>
+      <div>
+        <b>Counterfeit or altered currency notes</b>
+        <span>Fraudsters pay with fake or altered notes during busy hours when you're distracted. Check large notes carefully, especially during rush periods.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>✅ How to protect yourself</h2>
+    <div class="card-sub">Simple habits that stop most of these scams before they start.</div>
+
+    <div class="tip-item">
+      <div class="icon">🔊</div>
+      <div>
+        <b>Turn on payment voice confirmation</b>
+        <span>Enable the audio alert in your payment app so you hear the amount received in real time, instead of relying on a customer's screen.</span>
+      </div>
+    </div>
+
+    <div class="tip-item">
+      <div class="icon">🔍</div>
+      <div>
+        <b>Check your QR code weekly</b>
+        <span>Scan your own displayed QR code once in a while to confirm it still points to your account.</span>
+      </div>
+    </div>
+
+    <div class="tip-item">
+      <div class="icon">🔒</div>
+      <div>
+        <b>Never share OTP, PIN or app screen</b>
+        <span>No genuine bank, payment app, or government scheme will ever ask for your OTP, UPI PIN, or ask you to share your screen.</span>
+      </div>
+    </div>
+
+    <div class="tip-item">
+      <div class="icon">🧾</div>
+      <div>
+        <b>Keep a paper backup of daily totals</b>
+        <span>A quick handwritten tally alongside your app records makes it easy to spot a missing or mismatched payment the same day.</span>
+      </div>
+    </div>
+
+    <div class="tip-item">
+      <div class="icon">👥</div>
+      <div>
+        <b>Verify new suppliers before advance payment</b>
+        <span>Ask other vendors if they've dealt with a supplier before, or meet in person, before sending money upfront.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="report-box">
+    <h2>📞 If you think you've been scammed</h2>
+    <p>Report it immediately — acting fast improves the chance of recovering your money.</p>
+    <div class="helpline">
+      National Cyber Crime Helpline <span>1930</span>
+    </div>
+  </div>
+
+  <div style="text-align:center; padding-bottom:30px;">
+    <button class="back-btn" id="backToTrackerBtn2">← Back to Earnings Tracker</button>
+  </div>
+</div>
+<!-- /scamView -->
+
+<!-- Add Transaction Modal -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <button class="modal-close" id="closeAddBtn">✕</button>
+    <h2>Add Transaction</h2>
+    <form id="txForm" novalidate>
+      <div class="type-toggle">
+        <div class="type-btn income active" data-type="income">Income</div>
+        <div class="type-btn expense" data-type="expense">Expense</div>
+      </div>
+      <div class="field">
+        <label>Amount (₹)</label>
+        <input type="number" id="txAmount" min="0" step="0.01" placeholder="0.00" required>
+        <div class="field-error" id="amountError">Enter a valid amount greater than 0.</div>
+      </div>
+      <div class="field">
+        <label>Category</label>
+        <select id="txCategory" required>
+          <option value="">Select category</option>
+          <option>Sales</option>
+          <option>Food</option>
+          <option>Stock</option>
+          <option>Transport</option>
+          <option>Raw Materials</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Date</label>
+        <input type="date" id="txDate" required>
+      </div>
+      <div class="field">
+        <label>Note (optional)</label>
+        <input type="text" id="txNote" placeholder="e.g. Sold 20 plates">
+      </div>
+      <button type="submit" class="btn btn-blue" style="width:100%;">Save Transaction</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'vendorverse_transactions';
+  const SEEDED_KEY = 'vendorverse_seeded';
+  let transactions = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  let selectedType = 'income';
+  let currentView = 'daily';
+  let chart;
+
+  function seedSampleData(){
+    if(localStorage.getItem(SEEDED_KEY)) return;
+    const sample = [];
+    const today = new Date();
+    const dayOffsets = [0,1,2,3,4];
+    const incomeAmounts = [1250, 1400, 750, 1200, 900];
+    const expenseAmounts = [450, 500, 300, 350, 400];
+    const categories = ['Sales','Sales','Stock','Sales','Food'];
+    const expCategories = ['Raw Materials','Transport','Stock','Food','Other'];
+
+    dayOffsets.forEach((offset, i) => {
+      const d = new Date(today);
+      d.setDate(d.getDate() - offset);
+      const dateStr = d.toISOString().split('T')[0];
+      sample.push({ id: Date.now() - offset*1000 - 1, type:'income', amount: incomeAmounts[i], category: categories[i], date: dateStr, note: '' });
+      sample.push({ id: Date.now() - offset*1000 - 2, type:'expense', amount: expenseAmounts[i], category: expCategories[i], date: dateStr, note: '' });
+    });
+
+    transactions = sample.concat(transactions);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+    localStorage.setItem(SEEDED_KEY, '1');
+  }
+  seedSampleData();
+
+  const fmt = n => '₹' + Number(n).toLocaleString('en-IN', {maximumFractionDigits: 0});
+  const todayStr = () => new Date().toISOString().split('T')[0];
+
+  const addModal = document.getElementById('addModal');
+  document.getElementById('openAddBtn').addEventListener('click', () => {
+    document.getElementById('txDate').value = todayStr();
+    addModal.classList.add('active');
+  });
+  document.getElementById('closeAddBtn').addEventListener('click', () => addModal.classList.remove('active'));
+  addModal.addEventListener('click', e => { if(e.target === addModal) addModal.classList.remove('active'); });
+
+  document.getElementById('viewReportBtn').addEventListener('click', () => {
+    document.getElementById('reportCard').scrollIntoView({behavior:'smooth', block:'start'});
+  });
+
+  function showScamView(){
+    document.getElementById('trackerView').style.display = 'none';
+    document.getElementById('scamView').style.display = 'block';
+    window.scrollTo(0,0);
+  }
+  function showTrackerView(){
+    document.getElementById('scamView').style.display = 'none';
+    document.getElementById('trackerView').style.display = 'block';
+    window.scrollTo(0,0);
+  }
+  document.getElementById('scamPanel').addEventListener('click', (e) => {
+    e.preventDefault();
+    showScamView();
+  });
+  document.getElementById('backToTrackerBtn').addEventListener('click', showTrackerView);
+  document.getElementById('backToTrackerBtn2').addEventListener('click', showTrackerView);
+
+  document.querySelectorAll('.type-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedType = btn.dataset.type;
+    });
+  });
+
+  document.querySelectorAll('.chart-toggle button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.chart-toggle button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentView = btn.dataset.view;
+      renderChart();
+    });
+  });
+
+  document.getElementById('txForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const amount = parseFloat(document.getElementById('txAmount').value);
+    const category = document.getElementById('txCategory').value;
+    const date = document.getElementById('txDate').value;
+    const note = document.getElementById('txNote').value.trim();
+    const errorEl = document.getElementById('amountError');
+
+    if(!amount || amount <= 0){
+      errorEl.style.display = 'block';
+      return;
+    }
+    errorEl.style.display = 'none';
+
+    transactions.unshift({
+      id: Date.now(),
+      type: selectedType,
+      amount: amount,
+      category: category || 'Other',
+      date: date || todayStr(),
+      note: note
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+
+    this.reset();
+    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.type-btn.income').classList.add('active');
+    selectedType = 'income';
+    addModal.classList.remove('active');
+
+    renderAll();
+  });
+
+  function renderSummary(){
+    const today = todayStr();
+    const todayTx = transactions.filter(t => t.date === today);
+    const income = todayTx.filter(t => t.type === 'income').reduce((s,t) => s + t.amount, 0);
+    const expense = todayTx.filter(t => t.type === 'expense').reduce((s,t) => s + t.amount, 0);
+    document.getElementById('todayIncome').textContent = fmt(income);
+    document.getElementById('todayExpense').textContent = fmt(expense);
+    document.getElementById('todayProfit').textContent = fmt(income - expense);
+  }
+
+  function renderList(){
+    const listEl = document.getElementById('txList');
+    if(transactions.length === 0){
+      listEl.innerHTML = '<div class="empty-state">No transactions yet. Tap "+ Add Transaction" to get started.</div>';
+      return;
+    }
+    listEl.innerHTML = transactions.slice(0, 15).map(t => {
+      const icon = t.type === 'income' ? '↑' : '↓';
+      const dateDisplay = new Date(t.date).toLocaleDateString('en-IN', {day:'2-digit', month:'short'});
+      return `
+        <div class="tx-row">
+          <div class="tx-left">
+            <div class="tx-icon ${t.type}">${icon}</div>
+            <div class="tx-meta">
+              <b>${t.category}</b>
+              <span>${dateDisplay}${t.note ? ' · ' + t.note : ''}</span>
+            </div>
+          </div>
+          <div class="tx-amount ${t.type}">${t.type === 'income' ? '+' : '-'}${fmt(t.amount)}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function getLastNDays(n){
+    const days = [];
+    for(let i = n - 1; i >= 0; i--){
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      days.push(d.toISOString().split('T')[0]);
+    }
+    return days;
+  }
+
+  function renderChart(){
+    const chartWrap = document.getElementById('earningsChart').parentElement;
+
+    if(typeof Chart === 'undefined'){
+      chartWrap.innerHTML = '<div class="chart-fallback">Chart could not load — check your internet connection and refresh the page.</div>';
+      return;
+    }
+
+    const ctx = document.getElementById('earningsChart').getContext('2d');
+    let labels, incomeData, expenseData;
+
+    if(currentView === 'daily'){
+      const days = getLastNDays(7);
+      labels = days.map(d => new Date(d).toLocaleDateString('en-IN', {weekday:'short'}));
+      incomeData = days.map(d => transactions.filter(t => t.date === d && t.type === 'income').reduce((s,t)=>s+t.amount,0));
+      expenseData = days.map(d => transactions.filter(t => t.date === d && t.type === 'expense').reduce((s,t)=>s+t.amount,0));
+    } else if(currentView === 'weekly'){
+      labels = ['Week 4 ago','Week 3 ago','Week 2 ago','This week'];
+      incomeData = [0,0,0,0];
+      expenseData = [0,0,0,0];
+      const now = new Date();
+      transactions.forEach(t => {
+        const diffDays = Math.floor((now - new Date(t.date)) / 86400000);
+        const weekIndex = 3 - Math.floor(diffDays / 7);
+        if(weekIndex >= 0 && weekIndex <= 3){
+          if(t.type === 'income') incomeData[weekIndex] += t.amount;
+          else expenseData[weekIndex] += t.amount;
+        }
+      });
+    } else {
+      labels = [];
+      incomeData = [];
+      expenseData = [];
+      const now = new Date();
+      for(let i = 5; i >= 0; i--){
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const label = d.toLocaleDateString('en-IN', {month:'short'});
+        labels.push(label);
+        const monthTx = transactions.filter(t => {
+          const td = new Date(t.date);
+          return td.getFullYear() === d.getFullYear() && td.getMonth() === d.getMonth();
+        });
+        incomeData.push(monthTx.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0));
+        expenseData.push(monthTx.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0));
+      }
+    }
+
+    if(chart) chart.destroy();
+    chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          { label: 'Income', data: incomeData, backgroundColor: '#2563eb', borderRadius: 6, maxBarThickness: 28 },
+          { label: 'Expense', data: expenseData, backgroundColor: '#dc2626', borderRadius: 6, maxBarThickness: 28 }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'top', labels: { font: { family: 'Inter', size: 12 } } } },
+        scales: {
+          y: { beginAtZero: true, ticks: { callback: v => '₹' + v } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  function renderAll(){
+    renderSummary();
+    renderList();
+    renderChart();
+  }
+
+  document.getElementById('resetDataLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    if(confirm('This will delete all saved transactions. Continue?')){
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(SEEDED_KEY);
+      transactions = [];
+      renderAll();
+    }
+  });
+
+  renderAll();
+</script>
+
+</body>
+</html>

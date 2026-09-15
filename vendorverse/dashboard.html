@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My profile — VendorVerse</title>
+<style>
+  :root{
+    --blue: #5b8def;
+    --blue-dark: #3f6fe0;
+    --ink: #14161a;
+    --sub: #4b4f58;
+    --illo-bg: #eef1fb;
+    --line: #eceff3;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    background: #fff;
+  }
+  h1,h2,h3{ margin:0; letter-spacing:-0.01em; }
+  p{ margin:0; }
+  a{ color: inherit; text-decoration:none; }
+  button{ font-family: inherit; }
+
+  .top-bar{
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 900px; margin: 0 auto; padding: 24px 24px 0;
+  }
+  .back-link{ display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--sub); }
+  .back-link:hover{ color: var(--ink); }
+
+  .page-wrap{ max-width: 900px; margin: 0 auto; padding: 24px 24px 100px; }
+  .page-head{ display:flex; align-items:center; justify-content:space-between; gap: 20px; margin: 24px 0 36px; flex-wrap: wrap; }
+  .page-head h1{ font-size: clamp(24px, 3.4vw, 32px); font-weight: 800; margin-bottom: 6px; }
+  .page-head p{ color: var(--sub); font-size: 14.5px; }
+
+  .form-section{ border: 1px solid var(--line); border-radius: 20px; padding: 32px; margin-bottom: 24px; }
+  .section-title{ display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .section-num{
+    width: 28px; height: 28px; border-radius: 50%; background: var(--illo-bg); color: var(--blue);
+    display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; flex: none;
+  }
+  .section-title h2{ font-size: 19px; font-weight: 800; }
+
+  /* Profile header (photo + name) */
+  .profile-head{ display: flex; align-items: center; gap: 20px; margin-bottom: 8px; }
+  .profile-photo{
+    width: 76px; height: 76px; border-radius: 50%; background: var(--illo-bg); color: var(--blue);
+    display: flex; align-items: center; justify-content: center; flex: none; overflow: hidden; border: 1px solid var(--line);
+  }
+  .profile-photo img{ width: 100%; height: 100%; object-fit: cover; }
+  .profile-name{ font-size: 20px; font-weight: 800; }
+  .profile-shop{ color: var(--sub); font-size: 14px; margin-top: 4px; }
+
+  .chip-static{
+    display: inline-block; font-size: 12px; font-weight: 700; color: var(--blue-dark);
+    background: var(--illo-bg); padding: 4px 12px; border-radius: 999px; margin: 8px 6px 0 0;
+  }
+  .badge{
+    display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 700;
+    padding: 4px 12px; border-radius: 999px; margin-right: 6px;
+  }
+  .badge.yes{ background: #eaf6ec; color: #1e824c; }
+  .badge.no{ background: #f4f5f8; color: var(--sub); }
+
+  .detail-grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 18px 24px; margin-top: 22px; }
+  @media (max-width: 620px){ .detail-grid{ grid-template-columns: 1fr; } }
+  .detail-item.full{ grid-column: 1 / -1; }
+  .detail-item .label{ font-size: 12.5px; color: var(--sub); font-weight: 600; margin-bottom: 4px; }
+  .detail-item .value{ font-size: 14.5px; font-weight: 600; line-height: 1.5; }
+  .detail-item .value.muted{ color: var(--sub); font-weight: 500; font-style: italic; }
+
+  .score-display{
+    display: flex; align-items: center; gap: 14px; background: var(--illo-bg);
+    border-radius: 14px; padding: 16px 20px; margin-top: 22px;
+  }
+  .score-stars{ font-size: 20px; letter-spacing: 2px; color: #d8dce5; }
+  .score-stars .filled{ color: #f5a623; }
+  .score-text{ font-size: 13.5px; color: var(--sub); font-weight: 600; }
+
+  .btn-secondary{
+    background: #fff; border: 1px solid var(--line); color: var(--ink); font-weight: 700;
+    font-size: 13.5px; padding: 10px 20px; border-radius: 999px; cursor: pointer; white-space: nowrap;
+  }
+  .btn-secondary:hover{ background: #f7f8fa; }
+  .btn-primary{
+    background: var(--blue); border: none; color: #fff; font-weight: 700;
+    font-size: 14.5px; padding: 14px 28px; border-radius: 999px; cursor: pointer; display: inline-block;
+  }
+  .btn-primary:hover{ background: var(--blue-dark); }
+
+  .empty-note{ font-size: 14px; color: var(--sub); }
+
+  .tx-row{ display:flex; align-items:center; gap:14px; padding:12px 0; border-bottom:1px solid var(--line); }
+  .tx-row:last-child{ border-bottom: none; }
+  .tx-qr{ width:56px; height:56px; flex-shrink:0; }
+  .tx-info{ flex:1; }
+  .tx-title{ font-weight:600; font-size: 14px; }
+  .tx-meta{ font-size:12px; color:var(--sub); margin-top: 2px; }
+  .tx-status{ font-weight:700; font-size: 13px; }
+</style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <a href="index.html" class="back-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Home
+    </a>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <a href="qr.html" class="back-link">Generate QR</a>
+      <button type="button" class="back-link" id="signOutBtn" style="background:none;border:none;cursor:pointer;font:inherit;">Sign out</button>
+    </div>
+  </div>
+
+  <div class="page-wrap">
+    <div class="page-head">
+      <div>
+        <h1>Your profile</h1>
+        <p>Everything you saved during profile setup, all in one place.</p>
+      </div>
+      <a href="profile.html" class="btn-secondary">Edit profile</a>
+    </div>
+
+    <div id="dashboardContent">
+
+      <!-- 1. BASIC INFORMATION -->
+      <div class="form-section">
+        <div class="section-title">
+          <div class="section-num">1</div>
+          <h2>Basic Information</h2>
+        </div>
+
+        <div class="profile-head" style="margin-top:18px;">
+          <div class="profile-photo" id="profilePhoto">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+          </div>
+          <div>
+            <div class="profile-name" id="profileNameEl">—</div>
+            <div class="profile-shop" id="profileShopEl">—</div>
+          </div>
+        </div>
+
+        <div class="detail-grid">
+          <div class="detail-item"><div class="label">Mobile number</div><div class="value" id="dMobile">—</div></div>
+          <div class="detail-item"><div class="label">Email</div><div class="value" id="dEmail">—</div></div>
+          <div class="detail-item"><div class="label">Preferred language</div><div class="value" id="dLanguage">—</div></div>
+          <div class="detail-item"><div class="label">City / Area</div><div class="value" id="dCity">—</div></div>
+          <div class="detail-item full"><div class="label">Business address</div><div class="value" id="dAddress">—</div></div>
+        </div>
+      </div>
+
+      <!-- 2. BUSINESS INFORMATION -->
+      <div class="form-section">
+        <div class="section-title">
+          <div class="section-num">2</div>
+          <h2>Business Information</h2>
+        </div>
+
+        <div class="detail-grid">
+          <div class="detail-item"><div class="label">Business category</div><div class="value" id="dCategory">—</div></div>
+          <div class="detail-item"><div class="label">Shop type</div><div class="value" id="dShopType">—</div></div>
+          <div class="detail-item"><div class="label">Years in business</div><div class="value" id="dYears">—</div></div>
+          <div class="detail-item"><div class="label">Business hours</div><div class="value" id="dHours">—</div></div>
+          <div class="detail-item full"><div class="label">Products / services offered</div><div class="value" id="dProducts">—</div></div>
+        </div>
+      </div>
+
+      <!-- 3. DIGITAL INFORMATION -->
+      <div class="form-section">
+        <div class="section-title">
+          <div class="section-num">3</div>
+          <h2>Digital Information</h2>
+        </div>
+
+        <div style="margin-top:18px;">
+          <span class="badge" id="badgeUpi">UPI available</span>
+          <span class="badge" id="badgeQr">QR code available</span>
+          <span class="badge" id="badgeSmartphone">Smartphone available</span>
+          <span class="badge" id="badgeInternet">Internet access</span>
+        </div>
+
+        <div class="detail-grid" style="margin-top:22px;">
+          <div class="detail-item full">
+            <div class="label">Payment apps used</div>
+            <div class="value" id="dPaymentApps">—</div>
+          </div>
+        </div>
+
+        <div class="score-display">
+          <span class="score-stars" id="scoreStars">☆☆☆☆☆</span>
+          <span class="score-text" id="scoreText">Digital readiness score</span>
+        </div>
+      </div>
+
+      <!-- 4. FINANCIAL INFORMATION -->
+      <div class="form-section">
+        <div class="section-title">
+          <div class="section-num">4</div>
+          <h2>Financial Information</h2>
+        </div>
+
+        <div class="detail-grid" style="margin-top:18px;">
+          <div class="detail-item"><div class="label">Approximate earnings range</div><div class="value" id="dEarnings">—</div></div>
+          <div class="detail-item"><div class="label">Payment methods accepted</div><div class="value" id="dPaymentMethods">—</div></div>
+        </div>
+      </div>
+
+      <!-- RECENT TRANSACTIONS -->
+      <div class="form-section">
+        <div class="section-title">
+          <h2>Your recent QR transactions</h2>
+        </div>
+        <div id="historyList" style="font-size:14px; color:var(--sub); margin-top:14px;">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentVendor = null;
+
+    (async function checkAuth() {
+      try {
+        const res = await fetch('api/session_check.php');
+        const data = await res.json();
+        if (!data.logged_in) {
+          window.location.href = 'login.html';
+          return;
+        }
+        currentVendor = data.vendor;
+
+        const profRes = await fetch('api/profile_get.php');
+        const profData = await profRes.json();
+        if (!profData.success || !profData.profile) {
+          // No profile yet — send them to set one up first.
+          window.location.href = 'profile.html';
+          return;
+        }
+        renderProfile(profData.profile);
+        renderHistory(profData.transactions || []);
+      } catch (err) {
+        console.error('Session check failed', err);
+      }
+    })();
+
+    document.getElementById('signOutBtn').addEventListener('click', async () => {
+      await fetch('api/logout.php', { method: 'POST' });
+      window.location.href = 'login.html';
+    });
+
+    function text(id, val, muted) {
+      const el = document.getElementById(id);
+      const has = val !== null && val !== undefined && String(val).trim() !== '';
+      el.textContent = has ? val : (muted || 'Not provided');
+      el.classList.toggle('muted', !has);
+    }
+
+    function renderProfile(p) {
+      text('profileNameEl', p.full_name, '—');
+      text('profileShopEl', p.shop_name, '—');
+      if (p.photo_data_url) {
+        document.getElementById('profilePhoto').innerHTML = `<img src="${p.photo_data_url}" alt="Profile photo">`;
+      }
+
+      // 1. Basic
+      text('dMobile', p.mobile);
+      text('dEmail', p.contact_email);
+      text('dLanguage', p.language);
+      text('dCity', p.city);
+      text('dAddress', p.address);
+
+      // 2. Business
+      text('dCategory', p.category);
+      text('dShopType', p.shop_type);
+      text('dYears', p.years_in_business !== null && p.years_in_business !== '' ? p.years_in_business + ' yrs' : null);
+      text('dHours', (p.hours_open && p.hours_close) ? `${p.hours_open} – ${p.hours_close}` : null);
+      text('dProducts', p.products_offered);
+
+      // 3. Digital
+      setBadge('badgeUpi', 'UPI available', !!p.upi_available);
+      setBadge('badgeQr', 'QR code available', !!p.qr_available);
+      setBadge('badgeSmartphone', 'Smartphone available', !!p.smartphone_available);
+      setBadge('badgeInternet', 'Internet access', !!p.internet_access);
+      text('dPaymentApps', p.payment_apps ? p.payment_apps.split(',').join(', ') : null);
+
+      const flags = [p.upi_available, p.qr_available, p.smartphone_available, p.internet_access];
+      const checkedCount = flags.filter(Boolean).length;
+      const outOf5 = Math.round((checkedCount / flags.length) * 5);
+      const filled = '★'.repeat(outOf5);
+      const empty = '☆'.repeat(5 - outOf5);
+      document.getElementById('scoreStars').innerHTML = `<span class="filled">${filled}</span>${empty}`;
+      const labels = ['Just getting started', 'Basic digital presence', 'Growing digital readiness', 'Strong digital readiness', 'Excellent digital readiness', 'Fully digital-ready'];
+      document.getElementById('scoreText').textContent = labels[outOf5];
+
+      // 4. Financial
+      text('dEarnings', p.earnings_range);
+      text('dPaymentMethods', p.payment_methods ? p.payment_methods.split(',').join(', ') : null);
+    }
+
+    function setBadge(id, label, isYes) {
+      const el = document.getElementById(id);
+      el.textContent = `${label}: ${isYes ? 'Yes' : 'No'}`;
+      el.classList.remove('yes', 'no');
+      el.classList.add(isYes ? 'yes' : 'no');
+    }
+
+    function renderHistory(transactions) {
+      const el = document.getElementById('historyList');
+      if (!transactions.length) {
+        el.innerHTML = '<div class="empty-note">No QR codes generated yet. <a href="qr.html" style="color:var(--blue); font-weight:700;">Generate one</a>.</div>';
+        return;
+      }
+      el.innerHTML = '';
+      transactions.forEach(t => {
+        const row = document.createElement('div');
+        row.className = 'tx-row';
+
+        const qrBox = document.createElement('div');
+        qrBox.className = 'tx-qr';
+        row.appendChild(qrBox);
+
+        const info = document.createElement('div');
+        info.className = 'tx-info';
+        info.innerHTML = `
+          <div class="tx-title">${t.payee_name} ${t.amount ? '— ₹' + t.amount : ''}</div>
+          <div class="tx-meta">Scanned ${t.scan_count} time${t.scan_count === 1 ? '' : 's'}${t.last_scanned_at ? ' · last ' + t.last_scanned_at : ''}</div>
+        `;
+        row.appendChild(info);
+
+        const status = document.createElement('span');
+        status.className = 'tx-status';
+        status.textContent = t.status;
+        status.style.color = t.status === 'active' ? '#1e824c' : '#c0392b';
+        row.appendChild(status);
+
+        el.appendChild(row);
+
+        if (t.qr_url) {
+          new QRCode(qrBox, { text: t.qr_url, width: 56, height: 56, colorDark: '#14161a', colorLight: '#ffffff' });
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>

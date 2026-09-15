@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VendorVerse — The ultimate digital platform for small businesses</title>
+<style>
+  :root{
+    --blue: #5b8def;
+    --blue-dark: #3f6fe0;
+    --ink: #14161a;
+    --sub: #4b4f58;
+    --illo-bg: #eef1fb;
+    --card: #dfe7fb;
+    --line: #eceff3;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    background: #fff;
+  }
+
+  h1, h2, h3{ margin: 0; letter-spacing: -0.01em; }
+  p{ margin: 0; }
+  ul{ margin: 0; padding: 0; list-style: none; }
+  a{ color: inherit; text-decoration: none; }
+  button{ font-family: inherit; }
+
+  .section{ max-width: 1200px; margin: 0 auto; padding: 100px 48px; }
+
+  .eyebrow{
+    display: inline-block;
+    color: var(--blue);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .section-head{ max-width: 620px; margin: 0 auto 56px; text-align: center; }
+  .section-head h2{ font-size: clamp(28px, 3.4vw, 42px); font-weight: 800; margin-bottom: 16px; }
+  .section-head p{ color: var(--sub); font-size: 17px; line-height: 1.6; }
+
+  /* ---------- NAV ---------- */
+  .nav{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    max-width: 1600px;
+    margin: 24px auto 0;
+    padding: 14px 48px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    margin-inline: 48px;
+  }
+  .nav-left{ display: flex; align-items: center; gap: 28px; }
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  color: #9aa1af;
+  white-space: nowrap;
+}
+
+.logo img {
+  width: 82px;
+  height: 82px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+  .pill-btn{
+    background: var(--blue); color: #fff; border: none; font-weight: 600;
+    font-size: 15px; padding: 10px 22px; border-radius: 999px; cursor: pointer;
+  }
+  .pill-btn:hover{ background: var(--blue-dark); }
+
+  .nav-right{ display: flex; align-items: center; gap: 22px; }
+
+  .icon-btn{
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #f4f5f8; color: #232630; border: none; cursor: pointer;
+  }
+  .icon-btn:hover{ background: #e9ebf1; }
+
+  .phone{
+    display: flex; align-items: center; gap: 8px; color: #232630;
+    font-size: 15px; white-space: nowrap; background: none; border: none; cursor: pointer;
+  }
+
+  .account{ position: relative; display: flex; align-items: center; gap: 4px; color: #232630; cursor: pointer; background: none; border: none; }
+
+  .account-menu{
+    position: absolute; top: 46px; right: 0; background: #fff;
+    border: 1px solid var(--line); border-radius: 12px;
+    box-shadow: 0 12px 28px rgba(20,22,26,0.12);
+    min-width: 160px; padding: 6px; display: none; flex-direction: column; z-index: 10;
+  }
+  .account-menu.open{ display: flex; }
+  .account-menu button{
+    background: none; border: none; text-align: left; padding: 10px 12px;
+    border-radius: 8px; font-size: 14px; cursor: pointer; color: var(--ink);
+  }
+  .account-menu button:hover{ background: #f4f5f8; }
+
+  .contact-btn{
+    background: var(--blue); color: #fff; border: none; font-weight: 600;
+    font-size: 15px; padding: 14px 26px; border-radius: 999px; cursor: pointer; white-space: nowrap;
+  }
+  .contact-btn:hover{ background: var(--blue-dark); }
+
+  @media (max-width: 900px){ .phone{ display:none; } }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    max-width: 1600px; margin: 0 auto; padding: 72px 48px 0;
+    display: grid; grid-template-columns: 1.05fr 1fr; gap: 40px; align-items: center;
+  }
+  .hero-copy h1{ font-size: clamp(40px, 5vw, 68px); line-height: 1.05; font-weight: 800; margin: 0 0 28px; }
+  .hero-copy h1 .accent{ color: var(--blue); }
+  .hero-copy p{ font-size: 18px; color: var(--sub); max-width: 46ch; margin: 0 0 40px; }
+
+  .cta-row{ display: flex; align-items: center; flex-wrap: wrap; gap: 14px; }
+
+  .cta{
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--blue); color: #fff; border: none; font-weight: 700;
+    font-size: 17px; padding: 18px 30px; border-radius: 999px; cursor: pointer;
+  }
+  .cta:hover{ background: var(--blue-dark); }
+  .cta svg{ transition: transform .15s ease; }
+  .cta:hover svg{ transform: translateX(3px); }
+
+  .hero-illustration{ position: relative; display: flex; justify-content: center; align-items: center; }
+  .illo-blob{
+    position: absolute; width: 92%; height: 92%; background: var(--illo-bg);
+    border-radius: 50% 45% 55% 50% / 55% 50% 50% 45%; z-index: 0;
+  }
+  .hero-illustration svg{ position: relative; z-index: 1; width: 100%; height: auto; max-width: 640px; }
+
+  .bottom-band{ height: 64px; background: #f6f7fb; margin-top: 56px; }
+
+  /* ---------- STATS ---------- */
+  .stats{
+    max-width: 1200px; margin: 0 auto; padding: 56px 48px;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; text-align: center;
+  }
+  .stat h3{ font-size: clamp(30px, 3.6vw, 44px); font-weight: 800; color: var(--blue); margin-bottom: 8px; }
+  .stat p{ color: var(--sub); font-size: 14px; }
+  @media (max-width: 760px){ .stats{ grid-template-columns: repeat(2, 1fr); } }
+
+  /* ---------- FEATURES ---------- */
+  .features-grid{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .feature-card{
+    border: 1px solid var(--line); border-radius: 20px; padding: 32px 26px;
+    transition: box-shadow .15s ease, transform .15s ease;
+  }
+  .feature-card:hover{ box-shadow: 0 16px 32px rgba(20,22,26,0.08); transform: translateY(-2px); }
+  .feature-icon{
+    width: 48px; height: 48px; border-radius: 12px; background: var(--illo-bg); color: var(--blue);
+    display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
+  }
+  .feature-card h3{ font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+  .feature-card p{ color: var(--sub); font-size: 14.5px; line-height: 1.6; }
+  @media (max-width: 900px){ .features-grid{ grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px){ .features-grid{ grid-template-columns: 1fr; } }
+
+  /* ---------- PROCESS ---------- */
+  .process-alt{ background: #f6f7fb; }
+  .process-grid{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  .process-step{ position: relative; }
+  .step-number{
+    font-size: 40px; font-weight: 800; margin-bottom: 12px;
+    -webkit-text-stroke: 1.5px var(--blue); color: transparent;
+  }
+  .process-step h3{ font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+  .process-step p{ color: var(--sub); font-size: 14.5px; line-height: 1.6; }
+  @media (max-width: 760px){ .process-grid{ grid-template-columns: 1fr; } }
+
+  /* ---------- TESTIMONIALS ---------- */
+  .testimonial-wrap{ max-width: 760px; margin: 0 auto; text-align: center; position: relative; }
+  .testimonial-track{ overflow: hidden; }
+  .testimonial-slide{ display: none; }
+  .testimonial-slide.active{ display: block; }
+  .testimonial-quote{ font-size: clamp(19px, 2.4vw, 24px); line-height: 1.5; font-weight: 600; margin-bottom: 28px; }
+  .testimonial-person{ display: flex; align-items: center; justify-content: center; gap: 12px; }
+  .avatar{
+    width: 44px; height: 44px; border-radius: 50%; background: var(--illo-bg); color: var(--blue);
+    display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px;
+  }
+  .testimonial-person .who{ text-align: left; }
+  .testimonial-person .name{ font-weight: 700; font-size: 14.5px; }
+  .testimonial-person .role{ font-size: 13px; color: var(--sub); }
+  .testimonial-nav{ display: flex; justify-content: center; gap: 10px; margin-top: 36px; }
+  .dot{ width: 8px; height: 8px; border-radius: 50%; background: var(--card); border: none; cursor: pointer; padding: 0; }
+  .dot.active{ background: var(--blue); width: 22px; border-radius: 5px; transition: width .2s ease; }
+
+  /* ---------- CTA BANNER ---------- */
+  .cta-banner{
+    max-width: 1200px; margin: 0 auto 100px; background: var(--ink); border-radius: 28px;
+    padding: 64px 48px; display: flex; align-items: center; justify-content: space-between;
+    gap: 32px; flex-wrap: wrap;
+  }
+  .cta-banner h2{ color: #fff; font-size: clamp(24px, 3vw, 34px); font-weight: 800; max-width: 460px; }
+  .cta-banner p{ color: #b7bac2; margin-top: 12px; font-size: 15px; }
+
+  /* ---------- FAQ ---------- */
+  .faq-list{ max-width: 760px; margin: 0 auto; }
+  .faq-item{ border-bottom: 1px solid var(--line); }
+  .faq-question{
+    width: 100%; background: none; border: none; display: flex; align-items: center;
+    justify-content: space-between; padding: 22px 4px; font-size: 16px; font-weight: 600;
+    text-align: left; cursor: pointer; color: var(--ink);
+  }
+  .faq-question svg{ flex: none; transition: transform .2s ease; color: var(--sub); }
+  .faq-item.open .faq-question svg{ transform: rotate(45deg); color: var(--blue); }
+  .faq-answer{ max-height: 0; overflow: hidden; transition: max-height .25s ease; }
+  .faq-answer p{ color: var(--sub); font-size: 14.5px; line-height: 1.7; padding: 0 4px 22px; }
+
+  /* ---------- FOOTER ---------- */
+  footer{ border-top: 1px solid var(--line); padding: 56px 48px 32px; }
+  .footer-top{ max-width: 1200px; margin: 0 auto 40px; display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 32px; }
+  .footer-brand p{ color: var(--sub); font-size: 14px; margin-top: 14px; max-width: 32ch; line-height: 1.6; }
+  .footer-col h4{ font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--sub); margin-bottom: 16px; }
+  .footer-col li{ margin-bottom: 10px; }
+  .footer-col a{ font-size: 14.5px; color: var(--ink); }
+  .footer-col a:hover{ color: var(--blue); }
+  .footer-bottom{
+    max-width: 1200px; margin: 0 auto; padding-top: 24px; border-top: 1px solid var(--line);
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
+    gap: 12px; font-size: 13.5px; color: var(--sub);
+  }
+  .social-icons{ display: flex; gap: 10px; }
+  .social-icons a{
+    width: 36px; height: 36px; border-radius: 50%; background: #f4f5f8;
+    display: flex; align-items: center; justify-content: center; color: var(--ink);
+  }
+  .social-icons a:hover{ background: var(--illo-bg); color: var(--blue); }
+  @media (max-width: 860px){ .footer-top{ grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px){ .footer-top{ grid-template-columns: 1fr; } }
+
+  /* ---------- Contact modal ---------- */
+  .modal-overlay{
+    position: fixed; inset: 0; background: rgba(20,22,26,0.45); display: none;
+    align-items: center; justify-content: center; padding: 20px; z-index: 100;
+  }
+  .modal-overlay.open{ display: flex; }
+  .modal{
+    background: #fff; border-radius: 20px; padding: 32px; width: 100%; max-width: 400px;
+    position: relative; max-height: 90vh; overflow-y: auto;
+  }
+  .modal h2{ margin: 0 0 6px; font-size: 22px; }
+  .modal p{ margin: 0 0 20px; color: var(--sub); font-size: 14px; }
+  .modal-close{ position: absolute; top: 16px; right: 16px; background: none; border: none; cursor: pointer; color: var(--sub); }
+  .modal input, .modal textarea{
+    width: 100%; padding: 12px 14px; border: 1px solid #e2e5eb; border-radius: 10px;
+    font-family: inherit; font-size: 14px; margin-bottom: 14px; resize: vertical;
+  }
+  .modal input:focus, .modal textarea:focus{ outline:none; border-color: var(--blue); }
+  .modal-submit{
+    width: 100%; background: var(--blue); color: #fff; border: none; font-weight: 700;
+    font-size: 15px; padding: 14px; border-radius: 999px; cursor: pointer;
+  }
+  .modal-submit:hover{ background: var(--blue-dark); }
+  .modal-success{ display: none; text-align: center; padding: 12px 0 4px; }
+  .modal-success.open{ display: block; }
+  .modal-success svg{ color: var(--blue); margin-bottom: 10px; }
+
+  @media (max-width: 860px){
+    .nav{ flex-wrap: wrap; padding: 14px 20px; border-radius: 24px; margin-inline: 16px; }
+    .nav-right{ gap: 12px; }
+    .hero{ grid-template-columns: 1fr; padding: 40px 20px 0; }
+    .hero-illustration{ order: -1; }
+    .section{ padding: 72px 20px; }
+    .cta-banner{ padding: 40px 24px; }
+  }
+
+  /* ---------- AI CHATBOT WIDGET ---------- */
+  .chat-fab{
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    box-shadow: 0 12px 28px rgba(91,141,239,0.45);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    transition: background .15s ease, transform .15s ease;
+  }
+  .chat-fab:hover{ background: var(--blue-dark); transform: translateY(-2px); }
+  .chat-fab svg{ width: 26px; height: 26px; }
+  .chat-fab .chat-fab-close{ display: none; }
+  .chat-fab.open .chat-fab-chat{ display: none; }
+  .chat-fab.open .chat-fab-close{ display: block; }
+
+  .chat-panel{
+    position: fixed;
+    right: 24px;
+    bottom: 96px;
+    width: 360px;
+    max-width: calc(100vw - 32px);
+    height: 500px;
+    max-height: calc(100vh - 140px);
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    box-shadow: 0 30px 60px rgba(20,22,26,0.18);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 999;
+  }
+  .chat-panel.open{ display: flex; }
+
+  .chat-header{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 18px;
+    background: var(--blue);
+    color: #fff;
+  }
+  .chat-header .chat-avatar{
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .chat-header h3{ font-size: 15px; font-weight: 700; }
+  .chat-header p{ font-size: 12px; opacity: 0.85; }
+
+  .chat-messages{
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #fafbfd;
+  }
+  .chat-msg{
+    max-width: 82%;
+    padding: 10px 13px;
+    border-radius: 14px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+  }
+  .chat-msg.bot{
+    align-self: flex-start;
+    background: #fff;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    border-bottom-left-radius: 4px;
+  }
+  .chat-msg.user{
+    align-self: flex-end;
+    background: var(--blue);
+    color: #fff;
+    border-bottom-right-radius: 4px;
+  }
+  .chat-msg.error{
+    align-self: flex-start;
+    background: #fdecea;
+    color: #c0392b;
+    border: 1px solid #f5c6c0;
+  }
+  .chat-typing{
+    align-self: flex-start;
+    display: flex;
+    gap: 4px;
+    padding: 12px 14px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    border-bottom-left-radius: 4px;
+  }
+  .chat-typing span{
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--sub);
+    opacity: 0.4;
+    animation: chatBlink 1.2s infinite ease-in-out;
+  }
+  .chat-typing span:nth-child(2){ animation-delay: .2s; }
+  .chat-typing span:nth-child(3){ animation-delay: .4s; }
+  @keyframes chatBlink{ 0%,80%,100%{ opacity: .25; } 40%{ opacity: 1; } }
+
+  .chat-suggestions{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 0 16px 12px;
+    background: #fafbfd;
+  }
+  .chat-suggestion{
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--sub);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 11px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .chat-suggestion:hover{ border-color: var(--blue); color: var(--blue); }
+
+  .chat-input-row{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    border-top: 1px solid var(--line);
+    background: #fff;
+  }
+  .chat-input-row textarea{
+    flex: 1;
+    resize: none;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 13.5px;
+    max-height: 90px;
+    background: #fafbfd;
+  }
+  .chat-input-row textarea:focus{ outline: none; border-color: var(--blue); background: #fff; }
+  .chat-send{
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: var(--blue);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .chat-send:hover{ background: var(--blue-dark); }
+  .chat-send:disabled{ background: var(--card); cursor: not-allowed; }
+
+  @media (max-width: 480px){
+    .chat-panel{ right: 16px; left: 16px; width: auto; bottom: 88px; }
+    .chat-fab{ right: 16px; bottom: 16px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ================= NAV ================= -->
+  <nav class="nav">
+    <div class="nav-left">
+      <div class="logo">
+        <img src="logo.jpeg" alt="VendorVerse logo">
+        
+      </div>
+      <button class="pill-btn" type="button">Home</button>
+    </div>
+
+    <div class="nav-right">
+      <!-- <button class="icon-btn" type="button" aria-label="Search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button> -->
+
+      <button class="phone" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        +91 9082109757
+      </button>
+
+      <div style="position: relative;">
+        <button class="account" id="accountBtn" type="button" aria-haspopup="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="account-menu" id="accountMenu">
+          <a href="login.html" id="loginMenuLink"><button type="button">Log in / Sign up</button></a>
+          <a href="dashboard.html" id="profileMenuLink" style="display:none;"><button type="button">My profile</button></a>
+          <button type="button" id="signOutMenuBtn" style="display:none;">Sign out</button>
+        </div>
+      </div>
+
+      <button class="contact-btn" type="button" data-open-contact>Contact Us</button>
+    </div>
+  </nav>
+
+  <!-- ================= HERO ================= -->
+  <section class="hero">
+    <div class="hero-copy">
+      <h1>The <span class="accent">ultimate</span> digital platform for small businesses</h1>
+      <p>Crafting innovative digital solutions that elevate your business.</p>
+      <div class="cta-row">
+        <!-- Get Started -> navigates to login.html -->
+        <a class="cta" href="login.html">
+          Get Started
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+        <!-- Generate QR -> navigates to qr.html -->
+        <a class="cta" href="qr.html">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><line x1="14" y1="14" x2="14" y2="21"/><line x1="21" y1="14" x2="21" y2="21"/><line x1="17.5" y1="14" x2="17.5" y2="17.5"/><line x1="14" y1="17.5" x2="21" y2="17.5"/></svg>
+          Generate QR
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-illustration">
+      <div class="illo-blob"></div>
+      <svg viewBox="0 0 600 520" xmlns="http://www.w3.org/2000/svg">
+        <g fill="#5b8def" opacity="0.9">
+          <ellipse cx="560" cy="120" rx="26" ry="60" transform="rotate(25 560 120)"/>
+          <ellipse cx="585" cy="180" rx="22" ry="52" transform="rotate(25 585 180)"/>
+          <ellipse cx="555" cy="230" rx="18" ry="42" transform="rotate(35 555 230)"/>
+        </g>
+        <g fill="#7ea4f2" opacity="0.85">
+          <circle cx="70" cy="70" r="26"/>
+          <circle cx="105" cy="55" r="20"/>
+          <circle cx="60" cy="115" r="18"/>
+        </g>
+        <line x1="70" y1="96" x2="60" y2="230" stroke="#7ea4f2" stroke-width="2"/>
+        <rect x="120" y="70" width="400" height="300" rx="18" fill="#1c2030"/>
+        <rect x="140" y="90" width="360" height="240" rx="6" fill="#f4f6fb"/>
+        <rect x="160" y="108" width="46" height="46" rx="8" fill="#dfe7fb"/>
+        <rect x="216" y="108" width="46" height="46" rx="8" fill="#dfe7fb"/>
+        <rect x="272" y="108" width="70" height="46" rx="8" fill="#c7d6fb"/>
+        <rect x="352" y="108" width="70" height="46" rx="8" fill="#c7d6fb"/>
+        <rect x="160" y="164" width="320" height="18" rx="4" fill="#e3e8f5"/>
+        <rect x="160" y="192" width="240" height="14" rx="4" fill="#eceff7"/>
+        <rect x="160" y="220" width="140" height="90" rx="10" fill="#5b8def"/>
+        <rect x="312" y="220" width="168" height="90" rx="10" fill="#dfe7fb"/>
+      </svg>
+    </div>
+  </section>
+
+  <div class="bottom-band"></div>
+
+  <!-- ================= STATS ================= -->
+  <section class="stats">
+    <div class="stat"><h3>2,400+</h3><p>Small businesses served</p></div>
+    <div class="stat"><h3>99.9%</h3><p>Platform uptime</p></div>
+    <div class="stat"><h3>4.8/5</h3><p>Average customer rating</p></div>
+    <div class="stat"><h3>24/7</h3><p>Live support</p></div>
+  </section>
+
+  <!-- ================= FEATURES ================= -->
+  <section class="section" id="features">
+    <div class="section-head">
+      <span class="eyebrow">What you get</span>
+      <h2>Everything you need to grow</h2>
+      <p>One platform that replaces the five tools you're juggling today.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg></div>
+        <h3>Website builder</h3>
+        <p>Launch a fast, mobile-ready site with drag-and-drop sections — no code required.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+        <h3>Marketing tools</h3>
+        <p>Email campaigns, SEO checks, and social scheduling built into one dashboard.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></div>
+        <h3>Online store</h3>
+        <p>Sell products or services with built-in checkout, inventory, and order tracking.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+        <h3>Analytics dashboard</h3>
+        <p>See traffic, sales, and customer trends in real time, in plain language.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PROCESS ================= -->
+  <section class="process-alt">
+    <div class="section">
+      <div class="section-head">
+        <span class="eyebrow">How it works</span>
+        <h2>Up and running in three steps</h2>
+        <p>No developer, no lengthy setup — most businesses go live the same week.</p>
+      </div>
+      <div class="process-grid">
+        <div class="process-step">
+          <div class="step-number">01</div>
+          <h3>Tell us about your business</h3>
+          <p>Answer a few quick questions and we'll set up your starting template.</p>
+        </div>
+        <div class="process-step">
+          <div class="step-number">02</div>
+          <h3>Customize your site</h3>
+          <p>Adjust colors, pages, and products to match your brand — no code needed.</p>
+        </div>
+        <div class="process-step">
+          <div class="step-number">03</div>
+          <h3>Publish and grow</h3>
+          <p>Go live, connect your domain, and start tracking results from day one.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TESTIMONIALS ================= -->
+  <section class="section">
+    <div class="section-head">
+      <span class="eyebrow">Customers</span>
+      <h2>Trusted by small business owners</h2>
+    </div>
+    <div class="testimonial-wrap">
+      <div class="testimonial-track">
+        <div class="testimonial-slide active">
+          <p class="testimonial-quote">"Switching over cut our setup time from weeks to a single afternoon. Support actually picks up the phone."</p>
+          <div class="testimonial-person">
+            <div class="avatar">TF</div>
+            <div class="who"><div class="name">Tasneem Fatima</div><div class="role">Owner</div></div>
+          </div>
+        </div>
+        <div class="testimonial-slide">
+          <p class="testimonial-quote">"The analytics dashboard finally made sense of our sales data. We found our best-selling hours in minutes."</p>
+          <div class="testimonial-person">
+            <div class="avatar">SS</div>
+            <div class="who"><div class="name">Shirani Singh</div><div class="role">Founder</div></div>
+          </div>
+        </div>
+        <div class="testimonial-slide">
+          <p class="testimonial-quote">"We replaced three separate subscriptions with one platform and our monthly costs dropped by half."</p>
+          <div class="testimonial-person">
+            <div class="avatar">HS</div>
+            <div class="who"><div class="name">Huda Shaikh</div><div class="role">Manager</div></div>
+          </div>
+        </div>
+        <div class="testimonial-slide">
+          <p class="testimonial-quote">"Setup was quick and the support team walked us through everything we needed for launch day."</p>
+          <div class="testimonial-person">
+            <div class="avatar">SB</div>
+            <div class="who"><div class="name">Sumaiya Balbale</div><div class="role">Co-founder</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-nav" id="testimonialDots"></div>
+    </div>
+  </section>
+
+  <!-- ================= CTA BANNER ================= -->
+  <div class="cta-banner">
+    <div>
+      <h2>Ready to bring your business online?</h2>
+      <p>Start free — no credit card required, cancel anytime.</p>
+    </div>
+    <a class="cta" href="login.html">
+      Get Started
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </a>
+  </div>
+
+  <!-- ================= FAQ ================= -->
+  <section class="section">
+    <div class="section-head">
+      <span class="eyebrow">FAQ</span>
+      <h2>Common questions</h2>
+    </div>
+    <div class="faq-list" id="faqList">
+      <div class="faq-item">
+        <button class="faq-question" type="button">
+          Do I need any technical experience?
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <div class="faq-answer"><p>No. The platform is built for non-technical business owners — pages, products, and emails are all managed with simple visual editors.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" type="button">
+          Can I use my own domain name?
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <div class="faq-answer"><p>Yes — connect a domain you already own, or purchase one directly through your dashboard during setup.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" type="button">
+          What happens after my free trial?
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <div class="faq-answer"><p>You'll get a reminder before it ends. If you don't upgrade, your site is paused, not deleted — you can pick up anytime.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" type="button">
+          Can I cancel anytime?
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <div class="faq-answer"><p>Yes, there are no long-term contracts. Cancel from your account settings and you won't be billed again.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo">
+          <img src="logo.jpeg" alt="VendorVerse logo" style="width:78px;height:78px;border-radius:7px;object-fit:cover;">
+          VendorVerse
+        </div>
+        <p>Helping small vendors go digital — accept UPI payments, generate QR codes, and track your earnings, all in one place.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="qr.html">Generate QR Code</a></li>
+          <li><a href="profile.html">Vendor Profile</a></li>
+          <li><a href="earning.html">Earnings Tracker</a></li>
+          <li><a href="login.html">Log In / Sign Up</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#features">About</a></li>
+          <li><a href="#faqList">FAQ</a></li>
+          <li><a href="#" data-open-contact>Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="#" data-open-contact>Contact Us</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 VendorVerse. All rights reserved.</span>
+      <div class="social-icons">
+        <a href="#" aria-label="Twitter"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg></a>
+        <a href="#" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37a4 4 0 1 1-7.914 1.174A4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+        <a href="#" aria-label="LinkedIn"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8h4V23h-4V8zm7 0h3.83v2.05h.05c.53-1 1.84-2.05 3.79-2.05C19.5 8 21 10.29 21 14.16V23h-4v-8.03c0-1.92-.03-4.39-2.67-4.39-2.67 0-3.08 2.09-3.08 4.25V23h-4V8z"/></svg></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= Contact modal ================= -->
+  <div class="modal-overlay" id="contactModal">
+    <div class="modal">
+      <button class="modal-close" id="closeContact" type="button" aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+
+      <div id="contactForm">
+        <h2>Contact us</h2>
+        <p>Tell us a bit about your business and we'll get back to you.</p>
+        <form id="contactFormEl">
+          <input type="text" id="contactName" placeholder="Your name" required>
+          <input type="email" id="contactEmail" placeholder="Your email" required>
+          <textarea rows="4" id="contactMessage" placeholder="Message"></textarea>
+          <p id="contactError" style="color:#c0392b; font-size:13px; display:none; margin:8px 0 0;"></p>
+          <button type="submit" class="modal-submit">Send message</button>
+        </form>
+      </div>
+
+      <div class="modal-success" id="contactSuccess">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg>
+        <h2>Message sent</h2>
+        <p>Thanks for reaching out — we'll be in touch soon.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI CHATBOT WIDGET -->
+  <button class="chat-fab" id="chatFab" type="button" aria-label="Chat with VendorVerse Assistant">
+    <svg class="chat-fab-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+    <svg class="chat-fab-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+
+  <div class="chat-panel" id="chatPanel">
+    <div class="chat-header">
+      <div class="chat-avatar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      </div>
+      <div>
+        <h3>VendorVerse Assistant</h3>
+        <p>Ask about UPI, QR codes, or your account</p>
+      </div>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-msg bot">Hi! I'm the VendorVerse Assistant. Ask me about setting up UPI payments, generating a QR code, your vendor profile, or staying safe from payment scams.</div>
+    </div>
+
+    <div class="chat-suggestions" id="chatSuggestions">
+      <button class="chat-suggestion" type="button">How do I generate a QR code?</button>
+      <button class="chat-suggestion" type="button">Is my payment info safe?</button>
+      <button class="chat-suggestion" type="button">How do I sign up?</button>
+    </div>
+
+    <div class="chat-input-row">
+      <textarea id="chatInput" rows="1" placeholder="Type a message..." maxlength="800"></textarea>
+      <button class="chat-send" id="chatSend" type="button" aria-label="Send">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <script>
+
+    // Reflect login state in the account menu
+    (async function checkAuth() {
+      try {
+        const res = await fetch('api/session_check.php');
+        const data = await res.json();
+        document.getElementById('loginMenuLink').style.display = data.logged_in ? 'none' : '';
+        document.getElementById('profileMenuLink').style.display = data.logged_in ? '' : 'none';
+        document.getElementById('signOutMenuBtn').style.display = data.logged_in ? '' : 'none';
+      } catch (err) {
+        console.error('Session check failed', err);
+      }
+    })();
+    document.getElementById('signOutMenuBtn').addEventListener('click', async () => {
+      await fetch('api/logout.php', { method: 'POST' });
+      window.location.reload();
+    });
+
+    // Account dropdown
+    const accountBtn = document.getElementById('accountBtn');
+    const accountMenu = document.getElementById('accountMenu');
+    accountBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      accountMenu.classList.toggle('open');
+    });
+    document.addEventListener('click', () => accountMenu.classList.remove('open'));
+
+    // FAQ accordion
+    document.querySelectorAll('.faq-item').forEach(item => {
+      const question = item.querySelector('.faq-question');
+      const answer = item.querySelector('.faq-answer');
+      question.addEventListener('click', () => {
+        const isOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-item').forEach(i => {
+          i.classList.remove('open');
+          i.querySelector('.faq-answer').style.maxHeight = null;
+        });
+        if (!isOpen) {
+          item.classList.add('open');
+          answer.style.maxHeight = answer.scrollHeight + 'px';
+        }
+      });
+    });
+
+    // Testimonial carousel
+    const slides = document.querySelectorAll('.testimonial-slide');
+    const dotsWrap = document.getElementById('testimonialDots');
+    let current = 0;
+    slides.forEach((_, i) => {
+      const dot = document.createElement('button');
+      dot.className = 'dot' + (i === 0 ? ' active' : '');
+      dot.addEventListener('click', () => showSlide(i));
+      dotsWrap.appendChild(dot);
+    });
+    function showSlide(i) {
+      slides[current].classList.remove('active');
+      dotsWrap.children[current].classList.remove('active');
+      current = i;
+      slides[current].classList.add('active');
+      dotsWrap.children[current].classList.add('active');
+    }
+    setInterval(() => showSlide((current + 1) % slides.length), 5000);
+
+    // Contact modal
+    const contactModal = document.getElementById('contactModal');
+    document.querySelectorAll('[data-open-contact]').forEach(btn => {
+      btn.addEventListener('click', () => contactModal.classList.add('open'));
+    });
+    document.getElementById('closeContact').addEventListener('click', () => contactModal.classList.remove('open'));
+    contactModal.addEventListener('click', (e) => {
+      if (e.target === contactModal) contactModal.classList.remove('open');
+    });
+    document.getElementById('contactFormEl').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errorEl = document.getElementById('contactError');
+      const payload = {
+        name: document.getElementById('contactName').value.trim(),
+        email: document.getElementById('contactEmail').value.trim(),
+        message: document.getElementById('contactMessage').value.trim(),
+      };
+      try {
+        const res = await fetch('api/contact.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!data.success) {
+          errorEl.textContent = data.error || 'Could not send your message.';
+          errorEl.style.display = 'block';
+          return;
+        }
+        document.getElementById('contactForm').style.display = 'none';
+        document.getElementById('contactSuccess').classList.add('open');
+      } catch (err) {
+        errorEl.textContent = 'Could not reach the server. Is your PHP/MySQL setup running?';
+        errorEl.style.display = 'block';
+      }
+    });
+    // ---- AI Chatbot widget ----
+    (function () {
+      const fab = document.getElementById('chatFab');
+      const panel = document.getElementById('chatPanel');
+      const messagesEl = document.getElementById('chatMessages');
+      const inputEl = document.getElementById('chatInput');
+      const sendBtn = document.getElementById('chatSend');
+      const suggestionsEl = document.getElementById('chatSuggestions');
+      let history = [];
+      let sending = false;
+
+      fab.addEventListener('click', () => {
+        const isOpen = panel.classList.toggle('open');
+        fab.classList.toggle('open', isOpen);
+        if (isOpen) inputEl.focus();
+      });
+
+      function addMessage(role, text) {
+        const div = document.createElement('div');
+        div.className = 'chat-msg ' + (role === 'user' ? 'user' : role === 'error' ? 'error' : 'bot');
+        div.textContent = text;
+        messagesEl.appendChild(div);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+        return div;
+      }
+
+      function showTyping() {
+        const div = document.createElement('div');
+        div.className = 'chat-typing';
+        div.id = 'chatTyping';
+        div.innerHTML = '<span></span><span></span><span></span>';
+        messagesEl.appendChild(div);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }
+      function hideTyping() {
+        const t = document.getElementById('chatTyping');
+        if (t) t.remove();
+      }
+
+      async function sendMessage(text) {
+        text = text.trim();
+        if (!text || sending) return;
+        sending = true;
+        sendBtn.disabled = true;
+        suggestionsEl.style.display = 'none';
+
+        addMessage('user', text);
+        inputEl.value = '';
+        inputEl.style.height = 'auto';
+        showTyping();
+
+        try {
+          const res = await fetch('api/chatbot.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text, history })
+          });
+          const data = await res.json();
+          hideTyping();
+          if (!data.success) {
+            addMessage('error', data.error || 'Something went wrong. Please try again.');
+            return;
+          }
+          addMessage('bot', data.reply);
+          history.push({ role: 'user', content: text });
+          history.push({ role: 'assistant', content: data.reply });
+          history = history.slice(-12);
+        } catch (err) {
+          hideTyping();
+          addMessage('error', 'Could not reach the server. Is your PHP/MySQL setup running?');
+        } finally {
+          sending = false;
+          sendBtn.disabled = false;
+        }
+      }
+
+      sendBtn.addEventListener('click', () => sendMessage(inputEl.value));
+      inputEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage(inputEl.value);
+        }
+      });
+      inputEl.addEventListener('input', () => {
+        inputEl.style.height = 'auto';
+        inputEl.style.height = Math.min(inputEl.scrollHeight, 90) + 'px';
+      });
+      suggestionsEl.querySelectorAll('.chat-suggestion').forEach(btn => {
+        btn.addEventListener('click', () => sendMessage(btn.textContent));
+      });
+    })();
+  </script>
+
+</body>
+</html>

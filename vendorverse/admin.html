@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VendorVerse Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14213D;
+    --ink-2:#1B2B4D;
+    --paper:#F7F5EF;
+    --paper-2:#FFFFFF;
+    --line:#E4E0D4;
+    --gold:#C89B3C;
+    --gold-soft:#F3E6C6;
+    --green:#2E7D5B;
+    --green-soft:#E3EFE8;
+    --clay:#B5442E;
+    --clay-soft:#F5E4DF;
+    --text:#1F2430;
+    --text-mute:#6B7080;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--paper);
+    color:var(--text);
+    display:flex;
+    min-height:100vh;
+  }
+  h1,h2,h3{font-family:'Fraunces',serif; margin:0; letter-spacing:-0.01em;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  a{color:inherit;}
+  button{font-family:inherit; cursor:pointer;}
+
+  .sidebar{
+    width:230px;
+    background:var(--ink);
+    color:#EDEBE1;
+    display:flex;
+    flex-direction:column;
+    flex-shrink:0;
+    position:sticky;
+    top:0;
+    height:100vh;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:22px 20px 18px 20px;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .seal{
+    width:34px; height:34px; border-radius:50%;
+    border:1.5px solid var(--gold);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces',serif; font-weight:700; font-size:14px;
+    color:var(--gold);
+    flex-shrink:0;
+  }
+  .brand-text{line-height:1.15;}
+  .brand-text .top{font-family:'Fraunces',serif; font-size:15.5px; font-weight:600; color:#fff;}
+  .brand-text .bottom{font-size:10.5px; letter-spacing:.09em; color:#9BA3BE; text-transform:uppercase;}
+
+  nav{padding:14px 10px; flex:1; overflow-y:auto;}
+  .nav-item{
+    display:flex; align-items:center; gap:11px;
+    padding:10px 12px;
+    border-radius:8px;
+    font-size:14px;
+    color:#C7CBDD;
+    margin-bottom:2px;
+    cursor:pointer;
+    border:1px solid transparent;
+    transition:background .12s ease, color .12s ease;
+  }
+  .nav-item .ic{width:17px; text-align:center; opacity:.85; font-size:14px;}
+  .nav-item:hover{background:rgba(255,255,255,0.06); color:#fff;}
+  .nav-item.active{
+    background:rgba(200,155,60,0.14);
+    color:#fff;
+    border-color:rgba(200,155,60,0.35);
+  }
+  .nav-item.active .ic{color:var(--gold); opacity:1;}
+  .sidebar-foot{
+    padding:14px 20px 18px;
+    border-top:1px solid rgba(255,255,255,0.08);
+    font-size:11px;
+    color:#7C8299;
+  }
+
+  .main{flex:1; min-width:0; display:flex; flex-direction:column;}
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 30px;
+    background:var(--paper-2);
+    border-bottom:1px solid var(--line);
+    position:sticky; top:0; z-index:5;
+  }
+  .topbar h1{font-size:20px; font-weight:600;}
+  .topbar .sub{font-size:12.5px; color:var(--text-mute); margin-top:2px;}
+  .admin-chip{
+    display:flex; align-items:center; gap:9px;
+    padding:6px 12px 6px 6px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:30px;
+  }
+  .admin-chip .av{
+    width:26px;height:26px;border-radius:50%;
+    background:var(--ink); color:var(--gold);
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px; font-weight:600; font-family:'Fraunces',serif;
+  }
+  .admin-chip .name{font-size:12.5px; font-weight:600;}
+  .admin-chip .role{font-size:10.5px; color:var(--text-mute);}
+
+  .content{padding:26px 30px 60px; flex:1;}
+  .view{display:none;}
+  .view.active{display:block;}
+
+  .stat-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
+    margin-bottom:22px;
+  }
+  .stat-card{
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 18px 16px;
+    position:relative;
+    overflow:hidden;
+  }
+  .stat-card::before{
+    content:"";
+    position:absolute; left:0; top:0; bottom:0; width:3px;
+    background:var(--gold);
+  }
+  .stat-card .label{
+    font-size:11px; text-transform:uppercase; letter-spacing:.08em;
+    color:var(--text-mute); font-weight:600; margin-bottom:8px;
+  }
+  .stat-card .value{font-family:'Fraunces',serif; font-size:30px; font-weight:600;}
+  .stat-card .delta{font-size:11.5px; color:var(--green); margin-top:6px; font-weight:500;}
+
+  .panel{
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px 22px;
+    margin-bottom:20px;
+  }
+  .panel-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:10px;}
+  .panel-head h2{font-size:16.5px; font-weight:600;}
+  .panel-head .hint{font-size:12px; color:var(--text-mute); margin-top:2px;}
+
+  #growthChart{width:100%; height:170px; display:block;}
+
+  .btn{
+    border:1px solid var(--line);
+    background:var(--paper-2);
+    padding:8px 14px;
+    border-radius:7px;
+    font-size:13px;
+    font-weight:600;
+    color:var(--text);
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .btn:hover{border-color:#cfc9b6;}
+  .btn-primary{background:var(--ink); color:#fff; border-color:var(--ink);}
+  .btn-primary:hover{background:var(--ink-2);}
+  .btn-gold{background:var(--gold); color:#3A2C08; border-color:var(--gold);}
+  .btn-danger{background:var(--paper-2); color:var(--clay); border-color:#E8D2CB;}
+  .btn-danger:hover{background:var(--clay-soft);}
+  .btn-green{background:var(--paper-2); color:var(--green); border-color:#CDE1D6;}
+  .btn-green:hover{background:var(--green-soft);}
+  .btn-sm{padding:5px 10px; font-size:12px; border-radius:6px;}
+  .btn-icon-only{padding:6px 9px;}
+
+  .toolbar{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;}
+  .search-box{
+    flex:1; min-width:200px;
+    display:flex; align-items:center; gap:8px;
+    border:1px solid var(--line);
+    border-radius:7px;
+    padding:8px 12px;
+    background:var(--paper);
+    font-size:13px;
+  }
+  .search-box input{border:none; background:transparent; outline:none; width:100%; font-size:13px; font-family:inherit;}
+  select{
+    border:1px solid var(--line);
+    border-radius:7px;
+    padding:8px 10px;
+    font-size:13px;
+    font-family:inherit;
+    background:var(--paper);
+    color:var(--text);
+  }
+
+  table{width:100%; border-collapse:collapse;}
+  thead th{
+    text-align:left;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.07em;
+    color:var(--text-mute);
+    font-weight:700;
+    padding:9px 10px;
+    border-bottom:1px solid var(--line);
+  }
+  tbody td{
+    padding:12px 10px;
+    font-size:13.5px;
+    border-bottom:1px solid var(--line);
+    vertical-align:middle;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:rgba(200,155,60,0.045);}
+  .id-cell{color:var(--text-mute); font-size:12px;}
+  .name-cell{font-weight:600;}
+  .name-cell .sub{font-weight:400; color:var(--text-mute); font-size:11.5px; margin-top:1px;}
+
+  .badge{
+    display:inline-flex; align-items:center; gap:5px;
+    padding:3px 10px 3px 8px;
+    border-radius:20px;
+    font-size:11.5px;
+    font-weight:600;
+  }
+  .badge::before{content:""; width:6px; height:6px; border-radius:50%;}
+  .badge.active{background:var(--green-soft); color:var(--green);}
+  .badge.active::before{background:var(--green);}
+  .badge.suspended{background:var(--clay-soft); color:var(--clay);}
+  .badge.suspended::before{background:var(--clay);}
+  .badge.pending{background:var(--gold-soft); color:#8A6A1E;}
+  .badge.pending::before{background:var(--gold);}
+
+  .row-actions{display:flex; gap:6px; justify-content:flex-end;}
+
+  .card-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:14px;}
+  .item-card{
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px;
+    background:var(--paper-2);
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .item-card .top-row{display:flex; justify-content:space-between; align-items:flex-start; gap:8px;}
+  .item-card h3{font-size:15px; font-weight:600;}
+  .item-card .meta{font-size:11.5px; color:var(--text-mute); line-height:1.5;}
+  .item-card .foot{display:flex; gap:6px; margin-top:auto; padding-top:8px;}
+  .tag{
+    font-size:10px; text-transform:uppercase; letter-spacing:.06em;
+    background:var(--paper); border:1px solid var(--line);
+    padding:2px 8px; border-radius:20px; color:var(--text-mute); font-weight:700;
+  }
+
+  .overlay{
+    position:fixed; inset:0; background:rgba(20,33,61,0.45);
+    display:none; align-items:flex-start; justify-content:center;
+    padding:60px 20px; z-index:50; overflow-y:auto;
+  }
+  .overlay.active{display:flex;}
+  .modal{
+    background:var(--paper-2);
+    border-radius:12px;
+    width:100%; max-width:440px;
+    padding:24px 24px 20px;
+    border:1px solid var(--line);
+  }
+  .modal h2{font-size:17px; margin-bottom:4px;}
+  .modal .hint{font-size:12px; color:var(--text-mute); margin-bottom:16px;}
+  .field{margin-bottom:13px;}
+  .field label{display:block; font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text-mute); margin-bottom:5px;}
+  .field input, .field textarea{
+    width:100%; border:1px solid var(--line); border-radius:7px;
+    padding:9px 10px; font-size:13.5px; font-family:inherit; outline:none;
+    background:var(--paper);
+  }
+  .field input:focus, .field textarea:focus{border-color:var(--gold);}
+  .field textarea{resize:vertical; min-height:60px;}
+  .modal-actions{display:flex; justify-content:flex-end; gap:8px; margin-top:18px;}
+
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(10px);
+    background:var(--ink); color:#fff; padding:11px 18px; border-radius:8px;
+    font-size:13px; font-weight:500; opacity:0; pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease; z-index:100;
+    display:flex; align-items:center; gap:8px;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  .toast .dot{width:7px; height:7px; border-radius:50%; background:var(--gold);}
+
+  .empty{padding:30px; text-align:center; color:var(--text-mute); font-size:13px;}
+
+  .verify-result{
+    margin-top:14px; padding:14px 16px; border-radius:8px; font-size:13px;
+    display:none;
+  }
+  .verify-result.ok{background:var(--green-soft); color:#1E5C41; display:block;}
+  .verify-result.bad{background:var(--clay-soft); color:#8C3220; display:block;}
+
+  @media (max-width:900px){
+    .stat-grid{grid-template-columns:repeat(2,1fr);}
+    .sidebar{width:72px;}
+    .brand-text, .nav-item span.label, .sidebar-foot{display:none;}
+    .nav-item{justify-content:center;}
+  }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="brand">
+    <div class="seal">V</div>
+    <div class="brand-text">
+      <div class="top">VendorVerse</div>
+      <div class="bottom">Admin</div>
+    </div>
+  </div>
+  <nav>
+    <div class="nav-item active" data-view="dashboard"><span class="ic">◆</span><span class="label">Dashboard</span></div>
+    <div class="nav-item" data-view="vendors"><span class="ic">▤</span><span class="label">Vendors</span></div>
+    <div class="nav-item" data-view="courses"><span class="ic">▥</span><span class="label">Courses</span></div>
+    <div class="nav-item" data-view="schemes"><span class="ic">⌂</span><span class="label">Schemes</span></div>
+    <div class="nav-item" data-view="certificates"><span class="ic">✦</span><span class="label">Certificates</span></div>
+    <div class="nav-item" data-view="scam"><span class="ic">⚑</span><span class="label">Scam Content</span></div>
+    <div class="nav-item" data-view="reports"><span class="ic">▦</span><span class="label">Reports</span></div>
+    <div class="nav-item" data-view="settings"><span class="ic">⚙</span><span class="label">Settings</span></div>
+  </nav>
+  <div class="sidebar-foot">Signed in as Admin<br>admin@vendorverse.com</div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div>
+      <h1 id="viewTitle">Platform Overview</h1>
+      <div class="sub" id="viewSub">Snapshot of VendorVerse activity</div>
+    </div>
+    <div class="admin-chip">
+      <div class="av">A</div>
+      <div>
+        <div class="name">Admin</div>
+        <div class="role">Administrator</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <section class="view active" id="view-dashboard">
+      <div class="stat-grid">
+        <div class="stat-card"><div class="label">Vendors</div><div class="value mono">1,245</div><div class="delta">+38 this month</div></div>
+        <div class="stat-card"><div class="label">Active Users</div><div class="value mono">892</div><div class="delta">+12 this week</div></div>
+        <div class="stat-card"><div class="label">Courses</div><div class="value mono">24</div><div class="delta">2 in draft</div></div>
+        <div class="stat-card"><div class="label">Certificates</div><div class="value mono">647</div><div class="delta">+54 this month</div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>User Growth</h2>
+            <div class="hint">New vendor sign-ups, last 8 months</div>
+          </div>
+        </div>
+        <canvas id="growthChart"></canvas>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div><h2>Recent Activity</h2><div class="hint">Latest platform events</div></div>
+        </div>
+        <table>
+          <tbody id="activityBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="view" id="view-vendors">
+      <div class="panel">
+        <div class="panel-head">
+          <div><h2>Vendors</h2><div class="hint">View, search, and manage vendor accounts</div></div>
+        </div>
+        <div class="toolbar">
+          <div class="search-box">🔍 <input id="vendorSearch" placeholder="Search by name or email…"></div>
+          <select id="vendorFilter">
+            <option value="all">All statuses</option>
+            <option value="active">Active</option>
+            <option value="suspended">Suspended</option>
+            <option value="pending">Pending review</option>
+          </select>
+        </div>
+        <table>
+          <thead><tr><th>Vendor</th><th>Business</th><th>Joined</th><th>Status</th><th></th></tr></thead>
+          <tbody id="vendorBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="view" id="view-courses">
+      <div class="panel">
+        <div class="panel-head">
+          <div><h2>Courses</h2><div class="hint">Manage lessons, quizzes, and completion tracking</div></div>
+          <button class="btn btn-primary" onclick="openModal('course')">+ Add Course</button>
+        </div>
+        <div class="card-grid" id="courseGrid"></div>
+      </div>
+    </section>
+
+    <section class="view" id="view-schemes">
+      <div class="panel">
+        <div class="panel-head">
+          <div><h2>Government Schemes</h2><div class="hint">Eligibility info and official links for vendors</div></div>
+          <button class="btn btn-primary" onclick="openModal('scheme')">+ Add Scheme</button>
+        </div>
+        <div class="card-grid" id="schemeGrid"></div>
+      </div>
+    </section>
+
+    <section class="view" id="view-certificates">
+      <div class="panel">
+        <div class="panel-head">
+          <div><h2>Verify a Certificate</h2><div class="hint">Look up any certificate by its ID</div></div>
+        </div>
+        <div class="toolbar">
+          <div class="search-box">🔎 <input id="certVerifyInput" placeholder="Enter certificate ID, e.g. VV-CERT-2291"></div>
+          <button class="btn btn-gold" onclick="verifyCert()">Verify</button>
+        </div>
+        <div class="verify-result" id="verifyResult"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div><h2>Issued Certificates</h2><div class="hint">All certificates awarded on completion</div></div>
+        </div>
+        <table>
+          <thead><tr><th>Certificate ID</th><th>Vendor</th><th>Course</th><th>Issued</th></tr></thead>
+          <tbody id="certBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="view" id="view-scam">
+      <div class="panel">
+        <div class="panel-head">
+          <div><h2>Scam Awareness</h2><div class="hint">Examples, safety notes, and quizzes shown to vendors</div></div>
+          <button class="btn btn-primary" onclick="openModal('scam')">+ Add Scam Example</button>
+        </div>
+        <div class="card-grid" id="scamGrid"></div>
+      </div>
+    </section>
+
+    <section class="view" id="view-reports">
+      <div class="panel">
+        <div class="panel-head"><div><h2>Reports</h2><div class="hint">Export and review platform-wide data</div></div></div>
+        <div class="card-grid">
+          <div class="item-card"><h3>Vendor Activity</h3><div class="meta">Sign-ups, logins, and suspensions by month.</div><div class="foot"><button class="btn btn-sm">Export CSV</button></div></div>
+          <div class="item-card"><h3>Course Completion</h3><div class="meta">Enrollment vs. completion rate per course.</div><div class="foot"><button class="btn btn-sm">Export CSV</button></div></div>
+          <div class="item-card"><h3>Certificates Issued</h3><div class="meta">All certificates, filterable by course and date.</div><div class="foot"><button class="btn btn-sm">Export CSV</button></div></div>
+          <div class="item-card"><h3>Scam Reports</h3><div class="meta">Vendor-submitted scam reports awaiting review.</div><div class="foot"><button class="btn btn-sm">Export CSV</button></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-settings">
+      <div class="panel">
+        <div class="panel-head"><div><h2>Admin Accounts</h2><div class="hint">Everyone with administrator access</div></div></div>
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead>
+          <tbody>
+            <tr><td class="name-cell">Admin</td><td class="id-cell mono">admin@vendorverse.com</td><td><span class="badge active">admin</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div><h2>Platform Settings</h2><div class="hint">General configuration</div></div></div>
+        <div class="field"><label>Platform name</label><input value="VendorVerse"></div>
+        <div class="field"><label>Support email</label><input value="support@vendorverse.com"></div>
+        <button class="btn btn-primary">Save Changes</button>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h2 id="modalTitle">Add Item</h2>
+    <div class="hint" id="modalHint"></div>
+    <form id="modalForm"></form>
+    <div class="modal-actions">
+      <button class="btn" type="button" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" type="button" onclick="submitModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="dot"></span><span id="toastMsg"></span></div>
+
+<script>
+let vendors = [
+  {id:"VV-0192", name:"Rahim Uddin", email:"rahim@example.com", business:"Rahim's Grocery", joined:"Jan 2026", status:"active"},
+  {id:"VV-0193", name:"Fatima Khatun", email:"fatima@example.com", business:"Fatima Tailors", joined:"Feb 2026", status:"active"},
+  {id:"VV-0194", name:"Karim Molla", email:"karim@example.com", business:"Karim Hardware", joined:"Mar 2026", status:"suspended"},
+  {id:"VV-0195", name:"Nasrin Akter", email:"nasrin@example.com", business:"Nasrin Boutique", joined:"Mar 2026", status:"pending"},
+  {id:"VV-0196", name:"Jamal Hossain", email:"jamal@example.com", business:"Jamal Electronics", joined:"Apr 2026", status:"active"},
+  {id:"VV-0197", name:"Ayesha Begum", email:"ayesha@example.com", business:"Ayesha's Kitchen", joined:"Jun 2026", status:"active"},
+];
+
+let courses = [
+  {id:"C-01", title:"Pricing Your Products", lessons:6, quizzes:2, completion:78},
+  {id:"C-02", title:"Basic Bookkeeping", lessons:8, quizzes:3, completion:64},
+  {id:"C-03", title:"Selling Online Safely", lessons:5, quizzes:1, completion:91},
+  {id:"C-04", title:"Customer Service Basics", lessons:4, quizzes:1, completion:55},
+];
+
+let schemes = [
+  {id:"S-01", title:"Small Business Micro-Loan", eligibility:"Registered vendors, < 2 yrs in business", link:"gov.example/microloan"},
+  {id:"S-02", title:"Women Entrepreneur Grant", eligibility:"Women-owned businesses", link:"gov.example/women-grant"},
+  {id:"S-03", title:"Digital Trade Subsidy", eligibility:"Vendors selling online", link:"gov.example/digital-subsidy"},
+];
+
+let scamItems = [
+  {id:"SC-01", title:"Fake Bank Verification Call", severity:"High"},
+  {id:"SC-02", title:"Advance Fee Loan Scam", severity:"High"},
+  {id:"SC-03", title:"Counterfeit Supplier Invoice", severity:"Medium"},
+];
+
+let certificates = [
+  {id:"VV-CERT-2291", vendor:"Rahim Uddin", course:"Pricing Your Products", issued:"12 Jun 2026"},
+  {id:"VV-CERT-2308", vendor:"Fatima Khatun", course:"Basic Bookkeeping", issued:"3 Jul 2026"},
+  {id:"VV-CERT-2315", vendor:"Ayesha Begum", course:"Selling Online Safely", issued:"29 Jul 2026"},
+];
+
+let activity = [
+  {text:"Karim Hardware account suspended", when:"2 hours ago"},
+  {text:"New scheme published — Digital Trade Subsidy", when:"1 day ago"},
+  {text:"54 certificates issued this month", when:"3 days ago"},
+  {text:"Scam example added — Advance Fee Loan Scam", when:"5 days ago"},
+];
+
+const titles = {
+  dashboard:["Platform Overview","Snapshot of VendorVerse activity"],
+  vendors:["Vendors","View, search, and manage vendor accounts"],
+  courses:["Courses","Lessons, quizzes, and completion stats"],
+  schemes:["Government Schemes","Eligibility info and official links"],
+  certificates:["Certificates","Issued certificates and verification"],
+  scam:["Scam Awareness","Examples, safety info, and quizzes"],
+  reports:["Reports","Export and review platform-wide data"],
+  settings:["Settings","Admin accounts and platform configuration"],
+};
+
+document.querySelectorAll(".nav-item").forEach(item=>{
+  item.addEventListener("click", ()=>{
+    document.querySelectorAll(".nav-item").forEach(i=>i.classList.remove("active"));
+    item.classList.add("active");
+    const v = item.dataset.view;
+    document.querySelectorAll(".view").forEach(s=>s.classList.remove("active"));
+    document.getElementById("view-"+v).classList.add("active");
+    document.getElementById("viewTitle").textContent = titles[v][0];
+    document.getElementById("viewSub").textContent = titles[v][1];
+  });
+});
+
+function toast(msg){
+  const t = document.getElementById("toast");
+  document.getElementById("toastMsg").textContent = msg;
+  t.classList.add("show");
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>t.classList.remove("show"), 2200);
+}
+
+function renderVendors(){
+  const q = document.getElementById("vendorSearch").value.toLowerCase();
+  const f = document.getElementById("vendorFilter").value;
+  const body = document.getElementById("vendorBody");
+  const rows = vendors.filter(v=>{
+    const matchesQ = v.name.toLowerCase().includes(q) || v.email.toLowerCase().includes(q);
+    const matchesF = f==="all" || v.status===f;
+    return matchesQ && matchesF;
+  });
+  body.innerHTML = rows.length ? rows.map(v=>`
+    <tr>
+      <td>
+        <div class="name-cell">${v.name}<div class="sub">${v.email}</div></div>
+      </td>
+      <td>${v.business}</td>
+      <td class="id-cell">${v.joined}</td>
+      <td><span class="badge ${v.status}">${v.status}</span></td>
+      <td>
+        <div class="row-actions">
+          ${v.status==="suspended"
+            ? `<button class="btn btn-sm btn-green" onclick="setVendorStatus('${v.id}','active')">Activate</button>`
+            : `<button class="btn btn-sm btn-danger" onclick="setVendorStatus('${v.id}','suspended')">Suspend</button>`}
+          <button class="btn btn-sm btn-icon-only" onclick="toast('Opening profile for ${v.name}')">View</button>
+        </div>
+      </td>
+    </tr>
+  `).join("") : `<tr><td colspan="5" class="empty">No vendors match your search.</td></tr>`;
+}
+document.getElementById("vendorSearch").addEventListener("input", renderVendors);
+document.getElementById("vendorFilter").addEventListener("change", renderVendors);
+
+function setVendorStatus(id, status){
+  const v = vendors.find(v=>v.id===id);
+  v.status = status;
+  renderVendors();
+  toast(`${v.name} ${status === "active" ? "activated" : "suspended"}`);
+}
+
+function renderCourses(){
+  const grid = document.getElementById("courseGrid");
+  grid.innerHTML = courses.map(c=>`
+    <div class="item-card">
+      <div class="top-row"><h3>${c.title}</h3><span class="tag">${c.completion}% done</span></div>
+      <div class="meta">${c.lessons} lessons · ${c.quizzes} quizzes</div>
+      <div class="foot">
+        <button class="btn btn-sm" onclick="toast('Editing ${c.title}')">Edit</button>
+        <button class="btn btn-sm" onclick="toast('Opening lessons for ${c.title}')">Lessons</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteItem('courses','${c.id}')">Delete</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderSchemes(){
+  const grid = document.getElementById("schemeGrid");
+  grid.innerHTML = schemes.map(s=>`
+    <div class="item-card">
+      <div class="top-row"><h3>${s.title}</h3></div>
+      <div class="meta">${s.eligibility}</div>
+      <div class="meta mono">${s.link}</div>
+      <div class="foot">
+        <button class="btn btn-sm" onclick="toast('Editing ${s.title}')">Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteItem('schemes','${s.id}')">Remove</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderScam(){
+  const grid = document.getElementById("scamGrid");
+  grid.innerHTML = scamItems.map(s=>`
+    <div class="item-card">
+      <div class="top-row"><h3>${s.title}</h3><span class="tag">${s.severity}</span></div>
+      <div class="meta">Shown to vendors in the safety feed and quiz bank.</div>
+      <div class="foot">
+        <button class="btn btn-sm" onclick="toast('Editing ${s.title}')">Edit</button>
+        <button class="btn btn-sm" onclick="toast('Building quiz for ${s.title}')">Add Quiz</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteItem('scam','${s.id}')">Remove</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderCerts(){
+  const body = document.getElementById("certBody");
+  body.innerHTML = certificates.map(c=>`
+    <tr>
+      <td class="mono id-cell">${c.id}</td>
+      <td>${c.vendor}</td>
+      <td>${c.course}</td>
+      <td class="id-cell">${c.issued}</td>
+    </tr>
+  `).join("");
+}
+
+function verifyCert(){
+  const val = document.getElementById("certVerifyInput").value.trim().toUpperCase();
+  const box = document.getElementById("verifyResult");
+  const found = certificates.find(c=>c.id.toUpperCase()===val);
+  if(!val){ box.className="verify-result"; return; }
+  if(found){
+    box.className = "verify-result ok";
+    box.textContent = `✓ Valid — issued to ${found.vendor} for "${found.course}" on ${found.issued}.`;
+  } else {
+    box.className = "verify-result bad";
+    box.textContent = `✕ No certificate found with ID "${val}".`;
+  }
+}
+
+function renderActivity(){
+  document.getElementById("activityBody").innerHTML = activity.map(a=>`
+    <tr><td>${a.text}</td><td class="id-cell" style="text-align:right; width:120px;">${a.when}</td></tr>
+  `).join("");
+}
+
+function deleteItem(type, id){
+  if(type==="courses"){ courses = courses.filter(c=>c.id!==id); renderCourses(); }
+  if(type==="schemes"){ schemes = schemes.filter(s=>s.id!==id); renderSchemes(); }
+  if(type==="scam"){ scamItems = scamItems.filter(s=>s.id!==id); renderScam(); }
+  toast("Removed");
+}
+
+const modalConfigs = {
+  course: {
+    title:"Add Course", hint:"New courses start as drafts until published.",
+    fields:[{key:"title",label:"Course title"},{key:"lessons",label:"Number of lessons"},{key:"quizzes",label:"Number of quizzes"}],
+    submit:(data)=>{
+      courses.push({id:"C-"+String(courses.length+1).padStart(2,"0"), title:data.title||"Untitled Course", lessons:Number(data.lessons)||0, quizzes:Number(data.quizzes)||0, completion:0});
+      renderCourses();
+    }
+  },
+  scheme: {
+    title:"Add Government Scheme", hint:"Shown to vendors under Government Schemes.",
+    fields:[{key:"title",label:"Scheme name"},{key:"eligibility",label:"Eligibility"},{key:"link",label:"Official link"}],
+    submit:(data)=>{
+      schemes.push({id:"S-"+String(schemes.length+1).padStart(2,"0"), title:data.title||"Untitled Scheme", eligibility:data.eligibility||"—", link:data.link||"—"});
+      renderSchemes();
+    }
+  },
+  scam: {
+    title:"Add Scam Example", hint:"Vendors will see this in their safety feed.",
+    fields:[{key:"title",label:"Scam title"},{key:"severity",label:"Severity (Low / Medium / High)"}],
+    submit:(data)=>{
+      scamItems.push({id:"SC-"+String(scamItems.length+1).padStart(2,"0"), title:data.title||"Untitled Example", severity:data.severity||"Medium"});
+      renderScam();
+    }
+  }
+};
+
+let activeModal = null;
+function openModal(type){
+  activeModal = type;
+  const cfg = modalConfigs[type];
+  document.getElementById("modalTitle").textContent = cfg.title;
+  document.getElementById("modalHint").textContent = cfg.hint;
+  document.getElementById("modalForm").innerHTML = cfg.fields.map(f=>`
+    <div class="field"><label>${f.label}</label><input data-key="${f.key}"></div>
+  `).join("");
+  document.getElementById("overlay").classList.add("active");
+}
+function closeModal(){ document.getElementById("overlay").classList.remove("active"); activeModal=null; }
+function submitModal(){
+  const cfg = modalConfigs[activeModal];
+  const data = {};
+  document.querySelectorAll("#modalForm [data-key]").forEach(inp=>{ data[inp.dataset.key] = inp.value; });
+  cfg.submit(data);
+  toast(cfg.title.replace("Add ","") + " added");
+  closeModal();
+}
+document.getElementById("overlay").addEventListener("click", e=>{ if(e.target.id==="overlay") closeModal(); });
+
+function drawChart(){
+  const canvas = document.getElementById("growthChart");
+  const ctx = canvas.getContext("2d");
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+  const w = rect.width, h = rect.height;
+  const data = [420,510,590,640,710,830,960,1080];
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug"];
+  const max = Math.max(...data) * 1.15;
+  const padL = 34, padB = 22, padT = 10, padR = 10;
+  const plotW = w - padL - padR, plotH = h - padT - padB;
+
+  ctx.clearRect(0,0,w,h);
+
+  ctx.strokeStyle = "#E4E0D4";
+  ctx.lineWidth = 1;
+  for(let i=0;i<=3;i++){
+    const y = padT + plotH - (plotH/3)*i;
+    ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(w-padR,y); ctx.stroke();
+    ctx.fillStyle = "#9AA0B0"; ctx.font = "10px Inter"; ctx.textAlign="right";
+    ctx.fillText(Math.round(max/3*i), padL-6, y+3);
+  }
+
+  const pts = data.map((d,i)=>[padL + (plotW/(data.length-1))*i, padT + plotH - (d/max)*plotH]);
+  ctx.beginPath();
+  ctx.moveTo(pts[0][0], padT+plotH);
+  pts.forEach(p=>ctx.lineTo(p[0],p[1]));
+  ctx.lineTo(pts[pts.length-1][0], padT+plotH);
+  ctx.closePath();
+  const grad = ctx.createLinearGradient(0,padT,0,padT+plotH);
+  grad.addColorStop(0,"rgba(200,155,60,0.28)");
+  grad.addColorStop(1,"rgba(200,155,60,0.02)");
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  ctx.beginPath();
+  pts.forEach((p,i)=> i===0?ctx.moveTo(p[0],p[1]):ctx.lineTo(p[0],p[1]));
+  ctx.strokeStyle = "#C89B3C";
+  ctx.lineWidth = 2.2;
+  ctx.lineJoin = "round";
+  ctx.stroke();
+
+  pts.forEach((p,i)=>{
+    ctx.beginPath(); ctx.arc(p[0],p[1],3,0,Math.PI*2);
+    ctx.fillStyle="#14213D"; ctx.fill();
+    ctx.fillStyle = "#6B7080"; ctx.font="10.5px Inter"; ctx.textAlign="center";
+    ctx.fillText(months[i], p[0], h-4);
+  });
+}
+
+renderVendors();
+renderCourses();
+renderSchemes();
+renderScam();
+renderCerts();
+renderActivity();
+window.addEventListener("load", drawChart);
+window.addEventListener("resize", drawChart);
+</script>
+</body>
+</html>

@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Complete your profile — VendorVerse</title>
+<style>
+  :root{
+    --blue: #5b8def;
+    --blue-dark: #3f6fe0;
+    --ink: #14161a;
+    --sub: #4b4f58;
+    --illo-bg: #eef1fb;
+    --line: #eceff3;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    background: #fff;
+  }
+  h1,h2,h3{ margin:0; letter-spacing:-0.01em; }
+  p{ margin:0; }
+  a{ color: inherit; text-decoration:none; }
+  button{ font-family: inherit; }
+
+  .top-bar{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px 24px 0;
+  }
+  .back-link{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--sub);
+  }
+  .back-link:hover{ color: var(--ink); }
+
+  .progress-label{
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sub);
+  }
+
+  .page-wrap{
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px 24px 100px;
+  }
+
+  .page-head{ text-align: center; margin: 24px 0 40px; }
+  .page-head h1{ font-size: clamp(26px, 3.4vw, 34px); font-weight: 800; margin-bottom: 10px; }
+  .page-head p{ color: var(--sub); font-size: 15px; }
+
+  /* Step progress */
+  .steps{
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 44px;
+  }
+  .step-dot{
+    width: 34px;
+    height: 4px;
+    border-radius: 4px;
+    background: var(--line);
+  }
+  .step-dot.active{ background: var(--blue); }
+
+  .form-section{
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 32px;
+    margin-bottom: 24px;
+  }
+
+  .section-title{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+  .section-num{
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--illo-bg);
+    color: var(--blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 13px;
+    flex: none;
+  }
+  .form-section h2{ font-size: 19px; font-weight: 800; }
+  .section-note{ color: var(--sub); font-size: 13.5px; margin: 6px 0 24px 40px; line-height: 1.5; }
+
+  .field{ margin-bottom: 18px; }
+  .field label{
+    display: block;
+    font-size: 13.5px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--ink);
+  }
+  .field .hint{ font-weight: 400; color: var(--sub); font-size: 12.5px; }
+
+  .field input[type="text"],
+  .field input[type="tel"],
+  .field input[type="email"],
+  .field input[type="number"],
+  .field input[type="time"],
+  .field select,
+  .field textarea{
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #e2e5eb;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    background: #fff;
+    color: var(--ink);
+  }
+  .field textarea{ resize: vertical; }
+  .field input:focus, .field select:focus, .field textarea:focus{
+    outline: none;
+    border-color: var(--blue);
+  }
+
+  .field-row{ display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 620px){ .field-row{ grid-template-columns: 1fr; } }
+
+  /* Photo upload */
+  .photo-upload{
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .photo-preview{
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--illo-bg);
+    color: var(--blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .photo-preview img{ width: 100%; height: 100%; object-fit: cover; }
+  .photo-btn{
+    background: #fff;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 13.5px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .photo-btn:hover{ background: #f7f8fa; }
+
+  /* Chip / checkbox groups */
+  .chip-group{ display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip{
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--ink);
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .chip input{ display: none; }
+  .chip.checked{
+    background: var(--illo-bg);
+    border-color: var(--blue);
+    color: var(--blue-dark);
+  }
+
+  /* Toggle (yes/no) */
+  .toggle-row{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .toggle-row:last-child{ border-bottom: none; }
+  .toggle-row .toggle-label{ font-size: 14px; font-weight: 600; }
+
+  .toggle-switch{
+    position: relative;
+    width: 46px;
+    height: 26px;
+    flex: none;
+  }
+  .toggle-switch input{
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .toggle-slider{
+    position: absolute;
+    inset: 0;
+    background: #dfe2e8;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background .15s ease;
+  }
+  .toggle-slider::before{
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: 3px;
+    top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform .15s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .toggle-switch input:checked + .toggle-slider{ background: var(--blue); }
+  .toggle-switch input:checked + .toggle-slider::before{ transform: translateX(20px); }
+
+  /* Radio cards (earnings) */
+  .radio-group{ display: flex; flex-direction: column; gap: 10px; }
+  .radio-card{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .radio-card input{ accent-color: var(--blue); width: 16px; height: 16px; }
+  .radio-card:has(input:checked){
+    border-color: var(--blue);
+    background: var(--illo-bg);
+  }
+
+  /* Digital readiness score */
+  .score-display{
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--illo-bg);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-top: 8px;
+  }
+  .score-stars{ font-size: 20px; letter-spacing: 2px; color: #d8dce5; }
+  .score-stars .filled{ color: #f5a623; }
+  .score-text{ font-size: 13.5px; color: var(--sub); font-weight: 600; }
+
+  .submit-bar{
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 8px;
+  }
+  .btn-secondary{
+    background: #fff;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 14.5px;
+    padding: 14px 24px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .btn-secondary:hover{ background: #f7f8fa; }
+  .btn-primary{
+    background: var(--blue);
+    border: none;
+    color: #fff;
+    font-weight: 700;
+    font-size: 14.5px;
+    padding: 14px 28px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .btn-primary:hover{ background: var(--blue-dark); }
+
+  /* Success screen */
+  .success-wrap{
+    max-width: 480px;
+    margin: 80px auto;
+    text-align: center;
+    padding: 0 24px;
+    display: none;
+  }
+  .success-wrap.show{ display: block; }
+  .success-icon{
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--illo-bg);
+    color: var(--blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+  }
+  .success-wrap h1{ font-size: 24px; font-weight: 800; margin-bottom: 10px; }
+  .success-wrap p{ color: var(--sub); font-size: 14.5px; line-height: 1.6; margin-bottom: 28px; }
+
+  #profileFormWrap.hide{ display: none; }
+</style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <a href="index.html" class="back-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Home
+    </a>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <a href="dashboard.html" class="back-link">My profile</a>
+      <a href="qr.html" class="back-link">Generate QR</a>
+      <button type="button" class="back-link" id="signOutBtn" style="background:none;border:none;cursor:pointer;font:inherit;">Sign out</button>
+    </div>
+  </div>
+
+  <div id="profileFormWrap">
+    <div class="page-wrap">
+      <div class="page-head">
+        <h1>Set up your vendor profile</h1>
+        <p>This helps customers discover you and helps us tailor VendorVerse to your business.</p>
+      </div>
+
+      <div class="steps">
+        <div class="step-dot active"></div>
+        <div class="step-dot active"></div>
+        <div class="step-dot active"></div>
+        <div class="step-dot active"></div>
+      </div>
+
+      <form id="profileForm">
+
+        <!-- 1. BASIC INFORMATION -->
+        <div class="form-section">
+          <div class="section-title">
+            <div class="section-num">1</div>
+            <h2>Basic Information</h2>
+          </div>
+          <p class="section-note">Tell us who you are and where to find you.</p>
+
+          <div class="field">
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" placeholder="e.g. Ravi Kumar" required>
+          </div>
+
+          <div class="field">
+            <label>Profile Photo <span class="hint">(optional)</span></label>
+            <div class="photo-upload">
+              <div class="photo-preview" id="photoPreview">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+              </div>
+              <div>
+                <button type="button" class="photo-btn" id="photoBtn">Upload photo</button>
+                <input type="file" id="photoInput" accept="image/*" style="display:none">
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="shopName">Business / Shop Name</label>
+            <input type="text" id="shopName" placeholder="e.g. Ravi's Fresh Juice Corner" required>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="mobile">Mobile Number</label>
+              <input type="tel" id="mobile" placeholder="+91 98765 43210" required>
+            </div>
+            <div class="field">
+              <label for="email">Email <span class="hint">(optional)</span></label>
+              <input type="email" id="email" placeholder="you@example.com">
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="language">Preferred Language</label>
+              <select id="language">
+                <option value="">Select language</option>
+                <option>Hindi</option>
+                <option>English</option>
+                <option>Marathi</option>
+                <option>Urdu</option>
+                <option>Gujarati</option>
+                <option>Tamil</option>
+                <option>Telugu</option>
+                <option>Bengali</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="city">City / Area</label>
+              <input type="text" id="city" placeholder="e.g. Andheri, Mumbai" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="address">Business Address or Location</label>
+            <textarea id="address" rows="2" placeholder="Shop number, street, landmark..."></textarea>
+          </div>
+        </div>
+
+        <!-- 2. BUSINESS INFORMATION -->
+        <div class="form-section">
+          <div class="section-title">
+            <div class="section-num">2</div>
+            <h2>Business Information</h2>
+          </div>
+
+          <div class="field">
+            <label>Business Category</label>
+            <div class="chip-group" id="categoryGroup">
+              <label class="chip"><input type="radio" name="category" value="Food & Beverages">Food & Beverages</label>
+              <label class="chip"><input type="radio" name="category" value="Clothing">Clothing</label>
+              <label class="chip"><input type="radio" name="category" value="Grocery">Grocery</label>
+              <label class="chip"><input type="radio" name="category" value="Electronics">Electronics</label>
+              <label class="chip"><input type="radio" name="category" value="Handicrafts">Handicrafts</label>
+              <label class="chip"><input type="radio" name="category" value="Services">Services</label>
+              <label class="chip"><input type="radio" name="category" value="Other">Other</label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="productsOffered">Products / Services Offered</label>
+            <textarea id="productsOffered" rows="2" placeholder="e.g. Fresh juices, shakes, and smoothies"></textarea>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="yearsInBusiness">Years in Business</label>
+              <input type="number" id="yearsInBusiness" min="0" placeholder="e.g. 3">
+            </div>
+            <div class="field">
+              <label for="shopType">Shop Type</label>
+              <select id="shopType">
+                <option value="">Select type</option>
+                <option>Street cart</option>
+                <option>Small shop</option>
+                <option>Home-based</option>
+                <option>Stall</option>
+                <option>Mobile vendor</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="hoursOpen">Business Hours — Opens</label>
+              <input type="time" id="hoursOpen">
+            </div>
+            <div class="field">
+              <label for="hoursClose">Business Hours — Closes</label>
+              <input type="time" id="hoursClose">
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. DIGITAL INFORMATION -->
+        <div class="form-section">
+          <div class="section-title">
+            <div class="section-num">3</div>
+            <h2>Digital Information</h2>
+          </div>
+          <p class="section-note">This is especially important for VendorVerse.</p>
+
+          <div class="toggle-row">
+            <span class="toggle-label">UPI Available?</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="upiAvailable">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">QR Code Available?</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="qrAvailable">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">Smartphone Available?</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="smartphoneAvailable">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">Internet Access?</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="internetAccess">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="field" style="margin-top: 22px;">
+            <label>Which payment apps do you use?</label>
+            <div class="chip-group" id="paymentAppsGroup">
+              <label class="chip"><input type="checkbox" value="Google Pay">Google Pay</label>
+              <label class="chip"><input type="checkbox" value="PhonePe">PhonePe</label>
+              <label class="chip"><input type="checkbox" value="Paytm">Paytm</label>
+              <label class="chip"><input type="checkbox" value="BHIM">BHIM</label>
+              <label class="chip"><input type="checkbox" value="Other">Other</label>
+            </div>
+          </div>
+
+          <div class="field" style="margin-top: 22px;">
+            <label>Digital Readiness Score</label>
+            <div class="score-display">
+              <span class="score-stars" id="scoreStars">☆☆☆☆☆</span>
+              <span class="score-text" id="scoreText">Toggle the options above to calculate</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. FINANCIAL INFORMATION -->
+        <div class="form-section">
+          <div class="section-title">
+            <div class="section-num">4</div>
+            <h2>Financial Information</h2>
+          </div>
+          <p class="section-note">Keep sensitive information minimal.</p>
+
+          <div class="field">
+            <label>Approximate Daily / Monthly Earnings Range</label>
+            <div class="radio-group">
+              <label class="radio-card"><input type="radio" name="earnings" value="₹0–₹500">₹0 – ₹500</label>
+              <label class="radio-card"><input type="radio" name="earnings" value="₹500–₹1,000">₹500 – ₹1,000</label>
+              <label class="radio-card"><input type="radio" name="earnings" value="₹1,000–₹2,500">₹1,000 – ₹2,500</label>
+              <label class="radio-card"><input type="radio" name="earnings" value="₹2,500+">₹2,500+</label>
+            </div>
+          </div>
+
+          <div class="field" style="margin-top: 22px;">
+            <label>Payment Methods</label>
+            <div class="chip-group" id="paymentMethodsGroup">
+              <label class="chip"><input type="checkbox" value="Cash">Cash</label>
+              <label class="chip"><input type="checkbox" value="UPI">UPI</label>
+              <label class="chip"><input type="checkbox" value="Card">Card</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="submit-bar">
+          <button type="button" class="btn-secondary" id="skipBtn">Skip for now</button>
+          <button type="submit" class="btn-primary">Save profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div class="success-wrap" id="successWrap">
+    <div class="success-icon">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg>
+    </div>
+    <h1>Profile saved</h1>
+    <p>Your vendor profile is ready. You can update these details anytime from your account settings.</p>
+    <a href="dashboard.html" class="btn-primary" style="display:inline-block;">Go to my profile</a>
+  </div>
+
+  <script>
+    // Require login: bounce to login.html if there's no active session.
+    let currentVendor = null;
+    (async function checkAuth() {
+      try {
+        const res = await fetch('api/session_check.php');
+        const data = await res.json();
+        if (!data.logged_in) {
+          window.location.href = 'login.html';
+          return;
+        }
+        currentVendor = data.vendor;
+        loadProfile();
+      } catch (err) {
+        console.error('Session check failed', err);
+      }
+    })();
+
+    document.getElementById('signOutBtn').addEventListener('click', async () => {
+      await fetch('api/logout.php', { method: 'POST' });
+      window.location.href = 'login.html';
+    });
+
+    async function loadProfile() {
+      try {
+        const res = await fetch('api/profile_get.php');
+        const data = await res.json();
+        if (!data.success || !data.profile) return;
+        const p = data.profile;
+
+        const setVal = (id, val) => { const el = document.getElementById(id); if (el && val !== null && val !== undefined) el.value = val; };
+        setVal('fullName', p.full_name);
+        setVal('shopName', p.shop_name);
+        setVal('mobile', p.mobile);
+        setVal('email', p.contact_email);
+        setVal('language', p.language);
+        setVal('city', p.city);
+        setVal('address', p.address);
+        setVal('productsOffered', p.products_offered);
+        setVal('yearsInBusiness', p.years_in_business);
+        setVal('shopType', p.shop_type);
+        setVal('hoursOpen', p.hours_open);
+        setVal('hoursClose', p.hours_close);
+        setVal('earningsRangeUnused', null); // placeholder, handled via radios below
+
+        if (p.category) {
+          const catInput = document.querySelector(`#categoryGroup input[value="${CSS.escape(p.category)}"]`);
+          if (catInput) { catInput.checked = true; catInput.dispatchEvent(new Event('change')); }
+        }
+        if (p.earnings_range) {
+          const earnInput = document.querySelector(`input[name="earnings"][value="${CSS.escape(p.earnings_range)}"]`);
+          if (earnInput) earnInput.checked = true;
+        }
+        (p.payment_apps ? p.payment_apps.split(',') : []).forEach(val => {
+          const el = document.querySelector(`#paymentAppsGroup input[value="${CSS.escape(val)}"]`);
+          if (el) { el.checked = true; el.closest('.chip').classList.add('checked'); }
+        });
+        (p.payment_methods ? p.payment_methods.split(',') : []).forEach(val => {
+          const el = document.querySelector(`#paymentMethodsGroup input[value="${CSS.escape(val)}"]`);
+          if (el) { el.checked = true; el.closest('.chip').classList.add('checked'); }
+        });
+
+        document.getElementById('upiAvailable').checked = !!p.upi_available;
+        document.getElementById('qrAvailable').checked = !!p.qr_available;
+        document.getElementById('smartphoneAvailable').checked = !!p.smartphone_available;
+        document.getElementById('internetAccess').checked = !!p.internet_access;
+        updateScore();
+
+        if (p.photo_data_url) {
+          document.getElementById('photoPreview').innerHTML = `<img src="${p.photo_data_url}" alt="Profile photo">`;
+        }
+      } catch (err) {
+        console.error('Could not load profile', err);
+      }
+    }
+
+    // Chip toggle styling (works for both radio and checkbox chips)
+    document.querySelectorAll('.chip').forEach(chip => {
+      const input = chip.querySelector('input');
+      input.addEventListener('change', () => {
+        if (input.type === 'radio') {
+          document.querySelectorAll(`input[name="${input.name}"]`).forEach(r => {
+            r.closest('.chip').classList.toggle('checked', r.checked);
+          });
+        } else {
+          chip.classList.toggle('checked', input.checked);
+        }
+      });
+    });
+
+    // Photo upload preview
+    const photoBtn = document.getElementById('photoBtn');
+    const photoInput = document.getElementById('photoInput');
+    const photoPreview = document.getElementById('photoPreview');
+    photoBtn.addEventListener('click', () => photoInput.click());
+    photoInput.addEventListener('change', () => {
+      const file = photoInput.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        photoPreview.innerHTML = `<img src="${e.target.result}" alt="Profile photo">`;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Digital readiness score
+    const digitalToggles = ['upiAvailable', 'qrAvailable', 'smartphoneAvailable', 'internetAccess'];
+    const scoreStars = document.getElementById('scoreStars');
+    const scoreText = document.getElementById('scoreText');
+
+    function updateScore() {
+      const checkedCount = digitalToggles.filter(id => document.getElementById(id).checked).length;
+      const outOf5 = Math.round((checkedCount / digitalToggles.length) * 5);
+      const filled = '★'.repeat(outOf5);
+      const empty = '☆'.repeat(5 - outOf5);
+      scoreStars.innerHTML = `<span class="filled">${filled}</span>${empty}`;
+
+      const labels = ['Just getting started', 'Basic digital presence', 'Growing digital readiness', 'Strong digital readiness', 'Excellent digital readiness', 'Fully digital-ready'];
+      scoreText.textContent = labels[outOf5];
+    }
+    digitalToggles.forEach(id => document.getElementById(id).addEventListener('change', updateScore));
+
+    // Skip button
+    document.getElementById('skipBtn').addEventListener('click', () => {
+      window.location.href = 'dashboard.html';
+    });
+
+    // Form submit
+    document.getElementById('profileForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const checkedVals = (selector) => Array.from(document.querySelectorAll(selector))
+        .filter(el => el.checked).map(el => el.value);
+
+      const categoryEl = document.querySelector('#categoryGroup input:checked');
+      const earningsEl = document.querySelector('input[name="earnings"]:checked');
+      const photoImg = document.querySelector('#photoPreview img');
+
+      const payload = {
+        fullName: document.getElementById('fullName').value.trim(),
+        shopName: document.getElementById('shopName').value.trim(),
+        mobile: document.getElementById('mobile').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        language: document.getElementById('language').value,
+        city: document.getElementById('city').value.trim(),
+        address: document.getElementById('address').value.trim(),
+        category: categoryEl ? categoryEl.value : null,
+        productsOffered: document.getElementById('productsOffered').value.trim(),
+        yearsInBusiness: document.getElementById('yearsInBusiness').value,
+        shopType: document.getElementById('shopType').value,
+        hoursOpen: document.getElementById('hoursOpen').value,
+        hoursClose: document.getElementById('hoursClose').value,
+        upiAvailable: document.getElementById('upiAvailable').checked,
+        qrAvailable: document.getElementById('qrAvailable').checked,
+        smartphoneAvailable: document.getElementById('smartphoneAvailable').checked,
+        internetAccess: document.getElementById('internetAccess').checked,
+        paymentApps: checkedVals('#paymentAppsGroup input'),
+        earningsRange: earningsEl ? earningsEl.value : null,
+        paymentMethods: checkedVals('#paymentMethodsGroup input'),
+        photoDataUrl: photoImg ? photoImg.src : null,
+      };
+
+      const submitBtn = document.querySelector('#profileForm .btn-primary');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Saving...';
+
+      try {
+        const res = await fetch('api/profile_save.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!data.success) {
+          alert(data.error || 'Could not save profile.');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Save profile';
+          return;
+        }
+        document.getElementById('profileFormWrap').classList.add('hide');
+        document.getElementById('successWrap').classList.add('show');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
+      } catch (err) {
+        alert('Could not reach the server. Is your PHP/MySQL setup running?');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Save profile';
+      }
+    });
+  </script>
+
+</body>
+</html>
